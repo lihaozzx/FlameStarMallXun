@@ -881,21 +881,7 @@ export default {
         }, 5000);
         return;
       }
-      if (!document.cookie) {
-        //未登录,而且cookie里面只有token一个数据
-        sessionStorage.setItem(
-          "referrer",
-          window.location.href.split("/#/")[1]
-        );
-        this.$router.replace({ name: "Login" });
-      } else {
-        this.showBase = true;
-        // if (this.isOldPasword) {
-        //   this.showBase = true
-        // } else {
-        //   this.setPay = true
-        // }
-      }
+      this.showBase = true;
     },
     onBuyClicked(skuData) {
       mineApi.getPaymentPasswordStatus().then(res => {
@@ -911,7 +897,7 @@ export default {
         // Android终端
         let isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1;
         let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-        if (this.noneLogin) {
+        if (this.noneLogin) {//未登录
           sessionStorage.setItem(
             "referrer",
             window.location.href.split("/#/")[1]
@@ -931,7 +917,7 @@ export default {
             }
           }
         } else {
-          // if (this.isOldPasword) {
+          // 支付校验
           const data = {
             stockId: skuData.selectedSkuComb.id,
             type: this.$route.query.type
@@ -942,13 +928,13 @@ export default {
                 this.focusShow = true;
               } else if (res.data.content.status === 2) {
                 this.shareShow2 = true;
-              } else {
+              } else {//校验成功，跳转订单页面
                 const goodsInfo = {
-                  goodsId: this.goodsDetail.id,
-                  stockId: skuData.selectedSkuComb.id,
-                  type: this.$route.query.type,
-                  orderType: 3,
-                  quantity: 1
+                  goodsId: this.goodsDetail.id,//商品id
+                  stockId: skuData.selectedSkuComb.id,//规格id
+                  type: this.$route.query.type,//商品方式1零元购 1信用卡 3freebuy
+                  orderType: this.$route.query.type == 1 ? 3 : this.$route.query.type == 2 ? 4 : 0,//3零元购 4信用卡
+                  quantity: 1//购买数量
                 };
                 this.$router.push({
                   name: "Order",
