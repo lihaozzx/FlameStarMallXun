@@ -215,12 +215,45 @@
     </div>
     <van-dialog
       class="share-dialog"
-      closeOnClickOverlay
       v-model="shareShow2"
+      :closeOnClickOverlay="true"
       :showConfirmButton="false"
     >
       <div class="share-box">
-        <div class="content">
+        <p>
+          你已经领过一次了 <br>
+          分享朋友后，可以再获得一次<br>
+          新品免费体验的机会哦~
+        </p>
+        <img
+          class="arrow"
+          src="../../assets/home/ic_jiantou.png"
+          alt
+        />
+        <div class="s_btn_box">
+          <div>
+            <img
+              src="../../assets/share/share_tanc_haoyou_n.png"
+              alt=""
+            >
+            <span>分享好友</span>
+          </div>
+          <div>
+            <img
+              src="../../assets/share/share_tanc_qun_n.png"
+              alt=""
+            >
+            <span>分享群</span>
+          </div>
+          <div>
+            <img
+              src="../../assets/share/share_tanc_pic_n.png"
+              alt=""
+            >
+            <span>分享图片</span>
+          </div>
+        </div>
+        <!-- <div class="content">
           分享给朋友后
           <br />
           <span class="content">可以再次获得0元购的机会哟</span>
@@ -234,11 +267,11 @@
           class="bg"
           src="../../assets/goods/pic.png"
           alt
-        />
+        /> 
         <div
           @click="shareShow2 = false"
           class="btn"
-        >好的，现在就去</div>
+        >好的，现在就去</div>-->
       </div>
       <!-- <div class="tips">提示：建议您使用浏览器自带分享功能进行分享</div> -->
     </van-dialog>
@@ -882,21 +915,7 @@ export default {
         }, 5000);
         return;
       }
-      if (!document.cookie) {
-        //未登录,而且cookie里面只有token一个数据
-        sessionStorage.setItem(
-          "referrer",
-          window.location.href.split("/#/")[1]
-        );
-        this.$router.replace({ name: "Login" });
-      } else {
-        this.showBase = true;
-        // if (this.isOldPasword) {
-        //   this.showBase = true
-        // } else {
-        //   this.setPay = true
-        // }
-      }
+      this.showBase = true;
     },
     onBuyClicked(skuData) {
       mineApi.getPaymentPasswordStatus().then(res => {
@@ -912,7 +931,7 @@ export default {
         // Android终端
         let isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1;
         let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-        if (this.noneLogin) {
+        if (this.noneLogin) {//未登录
           sessionStorage.setItem(
             "referrer",
             window.location.href.split("/#/")[1]
@@ -943,7 +962,7 @@ export default {
                 this.focusShow = true;
               } else if (res.data.content.status === 2) {
                 this.shareShow2 = true;
-              } else {
+              } else {//校验成功，跳转订单页面
                 const goodsInfo = {
                   goodsId: this.goodsDetail.id,//商品id
                   stockId: skuData.selectedSkuComb.id,//规格id
@@ -1638,9 +1657,9 @@ export default {
 }
 .share-dialog {
   width: 100%;
-  height: 12rem;
+  // height: 12rem;
   position: fixed;
-  top: 50%;
+  top: 30%;
   left: 50%;
   overflow: hidden;
   font-size: 16px;
@@ -1653,8 +1672,40 @@ export default {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   .share-box {
-    margin-top: 2rem;
-    /*height: 6.3rem;*/
+    margin: 2rem auto 0;
+    background-image: url("../../assets/home/envelope.png");
+    width: 6rem;
+    height: 5.13rem;
+    background-size: 100% auto;
+    p {
+      width: 100%;
+      text-align: center;
+      font-size: 0.4rem;
+      color: #fff;
+    }
+    .s_btn_box {
+      width: 100%;
+      height: 2rem;
+      display: flex;
+      margin-top: 1.2rem;
+      box-sizing: border-box;
+      padding: 0 0.4rem;
+      justify-content: space-around;
+      div {
+        display: flex;
+        flex-direction: column;
+
+        img {
+          width: 1.15rem;
+          height: 1.15rem;
+        }
+        span {
+          margin-top: 0.1rem;
+          text-align: center;
+          font-size: 0.24rem;
+        }
+      }
+    }
     .arrow {
       position: absolute;
       top: 0;
