@@ -723,8 +723,10 @@ export default {
           homeApi.freeShoppingPlaceOrderValidate(data).then(res => {
             if (res.data.messageCode === "MSG_1001") {
               if (res.data.content.status === 3) {
+                this.showBase = false;
                 this.focusShow = true;
               } else if (res.data.content.status === 2) {
+                this.showBase = false;
                 this.shareShow2 = true;
               } else {
                 const goodsInfo = {

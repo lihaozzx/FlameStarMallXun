@@ -330,8 +330,8 @@ export default {
   },
   methods: {
     goZeroDetail(item) {
-      if (window.webkit && window.webkit.messageHandlers.goLogin) {
-        window.webkit.messageHandlers.goToDetail.postMessage(this.showGoods, item.id);//id,type
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
+        window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
       }
       if (window.wv) {
         window.wv.goToDetail(item.id, this.showGoods);
