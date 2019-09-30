@@ -945,19 +945,11 @@ export default {
                 this.shareShow2 = true;
               } else {
                 const goodsInfo = {
-<<<<<<< d44b6da78a792187b06bee3bc8acd4c79f0efb44
-                  goodsId: this.goodsDetail.id,
-                  stockId: skuData.selectedSkuComb.id,
-                  type: this.$route.query.type,
-                  orderType: 3,
-                  quantity: 1
-=======
                   goodsId: this.goodsDetail.id,//商品id
                   stockId: skuData.selectedSkuComb.id,//规格id
                   type: this.$route.query.type,//商品方式1零元购 2信用卡 3freebuy
                   orderType: this.$route.query.type == 1 ? 3 : this.$route.query.type == 2 ? 4 : 0,//3零元购 4信用卡
                   quantity: 1//购买数量
->>>>>>> 国庆节前发版1.0
                 };
                 this.$router.push({
                   name: "Order",

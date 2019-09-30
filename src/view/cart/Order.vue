@@ -334,12 +334,8 @@ export default {
       //   this.setPay = true
       //   return
       // }
-<<<<<<< d44b6da78a792187b06bee3bc8acd4c79f0efb44
-      if (this.goodsInfo.orderType == 3) {
-=======
       if (this.orderWaring) return;
       if (this.goodsInfo.orderType == 3 || this.goodsInfo.orderType == 4) {
->>>>>>> 国庆节前发版1.0
         this.freeShoppingPlaceOrder();
         return;
       }
