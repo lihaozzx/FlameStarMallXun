@@ -90,6 +90,7 @@
         src="../../assets/home/ic_share@3x.png"
         alt
         @click="snapshot"
+        style="display:none"
       />
 
       <div class="banner">
@@ -125,8 +126,8 @@
         <div class="zero_good_list_box">
           <!-- 2-进行中；3-已中断；4-已结束 -->
           <!-- +outCountdown -->
-          <p class="pf">{{showInfo.status==2?'活动已开始，快来参与吧!':showInfo.status==3?'活动暂时中断，请等待哦':showInfo.status==4?'活动已经结束':'活动暂未开始，请等待哦'}}</p>
-          <p class="ps">{{showGoods==1?'需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。':'需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。'}}</p>
+          <p class="pf">{{zeroActivityText[showInfo.status]}}</p>
+          <p class="ps">{{zeroGoodText[showGoods-1]}}</p>
           <div class="zero_good_list">
             <div class="box">
               <div
@@ -260,6 +261,8 @@ export default {
       seconds: [],
       haoSeconds: [],
       showGoods: 2,
+      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ''],
+      zeroActivityText: ['', '', '活动已开始，快来参与吧!', '活动暂时中断，请等待哦', '活动已经结束', '活动暂未开始，请等待哦'],
     };
   },
   created() {
