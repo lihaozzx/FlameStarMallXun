@@ -260,9 +260,7 @@ export default {
       minutes: [],
       seconds: [],
       haoSeconds: [],
-      showGoods: 2,
-      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ''],
-      zeroActivityText: ['', '', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束', '活动暂未开始，请等待哦'],
+      showGoods: 1,
     };
   },
   created() {

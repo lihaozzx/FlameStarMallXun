@@ -225,9 +225,9 @@ export default {
     }
   },
   created() {
-    this.getCheckGoods()
-    this.getAddress()
-    this.getPaymentPasswordStatus()
+    this.getCheckGoods();
+    this.getAddress();
+    this.getPaymentPasswordStatus();
   },
   destroyed() {
     localStorage.removeItem('selctAddress')
@@ -301,6 +301,7 @@ export default {
     },
     getCheckGoods() {
       this.goodsInfo = JSON.parse(decodeURIComponent(this.$route.params.goodsInfo));
+      console.log(this.goodsInfo);
       if (this.goodsInfo.goodsId || this.goodsInfo.activityGoodsId) {
         // 单个商品
         orderApi.postCheckGoods(this.goodsInfo).then(res => {

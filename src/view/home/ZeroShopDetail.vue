@@ -951,7 +951,7 @@ export default {
             }
           }
         } else {
-          // if (this.isOldPasword) {
+          // 支付校验
           const data = {
             stockId: skuData.selectedSkuComb.id,
             type: this.$route.query.type
