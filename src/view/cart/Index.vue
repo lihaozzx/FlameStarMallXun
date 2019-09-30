@@ -1,100 +1,161 @@
 <template>
-    <div class="cart">
-      <!--<TopNav name="购物车" :backShow="false"></TopNav>-->
-      <div class="cartMain">
-        <transition name="fade">
-          <div v-if="visibel" class="swipe-text">
-            <img src="../../assets/home/tzhi_icon.png" alt="">
-            <div class="font">{{messageShuffling}}</div>
+  <div class="cart">
+    <!--<TopNav name="购物车" :backShow="false"></TopNav>-->
+    <div class="cartMain">
+      <transition name="fade">
+        <div
+          v-if="visibel"
+          class="swipe-text"
+        >
+          <img
+            src="../../assets/home/tzhi_icon.png"
+            alt=""
+          >
+          <div class="font">{{messageShuffling}}</div>
+        </div>
+      </transition>
+      <ul>
+        <li
+          v-for="shop in carts"
+          :key="shop.id"
+          class="cartList"
+        >
+          <div
+            @click="goShopDetail(shop)"
+            class="cartList-title van-hairline--bottom"
+          >
+            <label>
+              <input
+                type="checkbox"
+                name="shopRadio"
+                :value="shop.storeId"
+                @click.stop="shopCheck($event,carts)"
+                class="disN"
+              >
+              <b></b>
+            </label>
+            <!--<van-checkbox style="margin-left: 0.2rem;margin-right: 0.1rem" @click="changeAllChecked()" v-model="checked" checked-color="#07c160"></van-checkbox>-->
+            <img
+              v-if="shop.imageUrl"
+              class="cartList-title-img"
+              :src="shop.imageUrl"
+              alt=""
+            >
+            <div>{{shop.storeName}}</div>
           </div>
-        </transition>
-        <ul>
-          <li v-for="shop in carts" :key="shop.id" class="cartList">
-            <div @click="goShopDetail(shop)" class="cartList-title van-hairline--bottom">
+          <van-swipe-cell
+            v-for="goods in shop.cartDetails"
+            :key="goods.id"
+            :right-width="80"
+          >
+            <div class="cartList-content van-hairline--bottom">
+              <!--<van-checkbox :key="item.id" v-model="checkedNames" checked-color="#07c160"></van-checkbox>-->
+              <!--<div @click="danxuan(item)">-->
+              <!--<img v-if="!item.danxuan" class="select" src="../../assets/goods/shoppingcart_list_onchoose.png" alt="">-->
+              <!--<img v-if="item.danxuan" class="select" src="../../assets/goods/shoppingcart_list_choose.png" alt="">-->
+              <!--</div>-->
               <label>
-                <input type="checkbox"
-                       name="shopRadio"
-                       :value="shop.storeId"
-                       @click.stop="shopCheck($event,carts)"
-                       class="disN">
+                <input
+                  :disabled="goods.status === 2 || goods.status === 3"
+                  type="checkbox"
+                  name="goodRadio"
+                  :cartId="goods.id"
+                  :price="goods.goodsPrice"
+                  :num="goods.quantity"
+                  :dataId="shop.storeId"
+                  :value="goods.goodsId"
+                  @click.stop="goodsCkeck($event,shop.cartDetails,carts,shop.storeId)"
+                  class="disN"
+                >
                 <b></b>
               </label>
-              <!--<van-checkbox style="margin-left: 0.2rem;margin-right: 0.1rem" @click="changeAllChecked()" v-model="checked" checked-color="#07c160"></van-checkbox>-->
-              <img v-if="shop.imageUrl" class="cartList-title-img" :src="shop.imageUrl" alt="">
-              <div>{{shop.storeName}}</div>
-            </div>
-            <van-swipe-cell v-for="goods in shop.cartDetails" :key="goods.id"  :right-width="80">
-              <div class="cartList-content van-hairline--bottom">
-                <!--<van-checkbox :key="item.id" v-model="checkedNames" checked-color="#07c160"></van-checkbox>-->
-                <!--<div @click="danxuan(item)">-->
-                  <!--<img v-if="!item.danxuan" class="select" src="../../assets/goods/shoppingcart_list_onchoose.png" alt="">-->
-                  <!--<img v-if="item.danxuan" class="select" src="../../assets/goods/shoppingcart_list_choose.png" alt="">-->
-                <!--</div>-->
-                <label>
-                  <input
-                    :disabled="goods.status === 2 || goods.status === 3"
-                    type="checkbox"
-                    name="goodRadio"
-                    :cartId="goods.id"
-                    :price="goods.goodsPrice"
-                    :num="goods.quantity"
-                    :dataId="shop.storeId"
-                    :value="goods.goodsId"
-                    @click.stop="goodsCkeck($event,shop.cartDetails,carts,shop.storeId)"
-                    class="disN">
-                  <b></b>
-                </label>
-                <img v-if="goods.imageUrl" @click="checkGoodsDeil(goods.goodsId)" class="good-img" :src="goods.imageUrl" alt="">
-                <div class="good-info">
-                  <div class="name">{{goods.goodsName}}</div>
-                  <div class="desc">{{goods.spcDesc}}</div>
-                  <div class="price">{{goods.goodsPrice}}</div>
-                  <div v-if="goods.status === 1" class="number">
-                    <van-stepper  @change="quantityChange(goods)" v-model="goods.quantity"></van-stepper>
-                  </div>
-                  <div class="shixiao" v-else>商品已失效</div>
+              <img
+                v-if="goods.imageUrl"
+                @click="checkGoodsDeil(goods.goodsId)"
+                class="good-img"
+                :src="goods.imageUrl"
+                alt=""
+              >
+              <div class="good-info">
+                <div class="name">{{goods.goodsName}}</div>
+                <div class="desc">{{goods.spcDesc}}</div>
+                <div class="price">{{goods.goodsPrice}}</div>
+                <div
+                  v-if="goods.status === 1"
+                  class="number"
+                >
+                  <van-stepper
+                    @change="quantityChange(goods)"
+                    v-model="goods.quantity"
+                  ></van-stepper>
                 </div>
+                <div
+                  class="shixiao"
+                  v-else
+                >商品已失效</div>
               </div>
-              <div @click="deleteGoods(goods)" class="delete" slot="right">删除</div>
-            </van-swipe-cell>
-          </li>
-          <li v-if="carts.length === 0" class="cartList">
-           <div class="no-goods">
-             <img src="../../assets/goods/gouwuche_no_n.png" alt="">
-             <div class="tip">
-               还没有商品呦
-             </div>
-           </div>
-          </li>
-        </ul>
-      </div>
-      <div v-if="carts.length !== 0" class="cartFooter">
-        <label class="checkAll">
-          <input type="checkbox" name="allRadio" class="disN" @click="allCheck($event)">
-          <b></b>
-          <span>全选</span>
-        </label>
-        <!--<div class="checkAll" @click="quanxuan()" >-->
-          <!--<img v-if="!qx" class="select" src="../../assets/goods/shoppingcart_list_onchoose.png" alt="">-->
-          <!--<img v-if="qx" class="select" src="../../assets/goods/shoppingcart_list_choose.png" alt="">-->
-          <!--<span>全选</span>-->
-        <!--</div>-->
-        <div class="freight">不含运费</div>
-        <div class="Total">
-          <div class="name">
-            合计：
+            </div>
+            <div
+              @click="deleteGoods(goods)"
+              class="delete"
+              slot="right"
+            >删除</div>
+          </van-swipe-cell>
+        </li>
+        <li
+          v-if="carts.length === 0"
+          class="cartList"
+        >
+          <div class="no-goods">
+            <img
+              src="../../assets/goods/gouwuche_no_n.png"
+              alt=""
+            >
+            <div class="tip">
+              还没有商品呦
+            </div>
           </div>
-          <div class="price">￥{{parseFloat((sumPrice).toFixed(2))}}</div>
+        </li>
+      </ul>
+    </div>
+    <div
+      v-if="carts.length !== 0"
+      class="cartFooter"
+    >
+      <label class="checkAll">
+        <input
+          type="checkbox"
+          name="allRadio"
+          class="disN"
+          @click="allCheck($event)"
+        >
+        <b></b>
+        <span>全选</span>
+      </label>
+      <!--<div class="checkAll" @click="quanxuan()" >-->
+      <!--<img v-if="!qx" class="select" src="../../assets/goods/shoppingcart_list_onchoose.png" alt="">-->
+      <!--<img v-if="qx" class="select" src="../../assets/goods/shoppingcart_list_choose.png" alt="">-->
+      <!--<span>全选</span>-->
+      <!--</div>-->
+      <div class="freight">不含运费</div>
+      <div class="Total">
+        <div class="name">
+          合计：
         </div>
+        <div class="price">￥{{parseFloat((sumPrice).toFixed(2))}}</div>
+      </div>
 
-        <div @click="settlement" class="Settlement">
-          结算
-        </div>
-        <!-- <div class="Settlementtwo">
+      <div
+        @click="settlement"
+        class="Settlement"
+      >
+        结算
+      </div>
+      <!-- <div class="Settlementtwo">
             <router-link :to="{name:'Home'}" >继续购物</router-link>
         </div> -->
-      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -107,11 +168,11 @@ export default {
   // components: {
   //   TopNav
   // },
-  data () {
+  data() {
     return {
       qx: false,
       checked: false,
-      visibel:false,
+      visibel: false,
       messageShuffling: '',
       messageShufflingList: [], // 消息通知轮播列表
       checkedNames: [],
@@ -126,27 +187,31 @@ export default {
       cartList: [] // 选中商品的购物车id（购物车下单的时候需要）
     }
   },
-  created () {
+  created() {
     this.getShoppingCart()
     this.getMessageShuffling()
   },
   methods: {
-    getMessageShuffling () {
+    getMessageShuffling() {
       const data = {
         pageNumber: 1,
         pageSize: 100000
       }
       homeApi.getTextSlideShow(data).then(res => {
-        this.messageShufflingList  = res.data.content.items
+        this.messageShufflingList = res.data.content.items
       })
       let i = 0
-      setInterval(()=> {
+      setInterval(() => {
         this.visibel = !this.visibel
         if (this.visibel) {
-          i++
-          this.messageShuffling = this.messageShufflingList[i]
+          if (i < this.messageShufflingList.length) {
+            i++;
+          } else {
+            i = 0;
+          }
+          this.messageShuffling = this.messageShufflingList[i];
         }
-      },3000)
+      }, 3000)
     },
     goodsCkeck: function (event, goodsList, shopList, shopId) {
       // 商品列表+-，店铺是否checked(店铺列表+-),全选是否checked
@@ -277,7 +342,7 @@ export default {
       this.caculate()
     },
     // 计算总金额总数量
-    caculate () {
+    caculate() {
       let input = document.getElementsByTagName('input')
       console.log(input.length)
       let newArr = []
@@ -299,7 +364,7 @@ export default {
         this.sumPrice += newArr[j].price * newArr[j].num
       }
     },
-    quantityChange (goods) {
+    quantityChange(goods) {
       const data = {
         id: goods.id,
         quantity: goods.quantity
@@ -309,7 +374,7 @@ export default {
         this.caculate()
       })
     },
-    deleteGoods (item) {
+    deleteGoods(item) {
       this.$dialog.confirm({
         title: '提示',
         message: '确认删除购物车所选商品？'
@@ -324,18 +389,18 @@ export default {
         // on cancel
       })
     },
-    settlement () {
+    settlement() {
       if (this.sumPrice === 0) {
         this.$toast('请选择你要结算的商品')
       } else {
         const goodsInfo = {
           cardIds: this.cartList
         }
-        this.$router.push({name: 'Order', params: {goodsInfo: encodeURIComponent(JSON.stringify(goodsInfo))}})
+        this.$router.push({ name: 'Order', params: { goodsInfo: encodeURIComponent(JSON.stringify(goodsInfo)) } })
       }
     },
 
-    quanxuan () {
+    quanxuan() {
       this.qx = !this.qx
       if (this.qx) {
         this.carts.forEach((v, i) => {
@@ -351,7 +416,7 @@ export default {
         })
       }
     },
-    danxuan (item) {
+    danxuan(item) {
       this.$set(item, 'danxuan', !item.danxuan)
       // item.danxuan = !item.danxuan
       if (!item.danxuan) {
@@ -365,7 +430,7 @@ export default {
       //   this.checkedNames = []
       // }
     },
-    getShoppingCart () {
+    getShoppingCart() {
       const data = {
         pageNumber: 1,
         pageSize: 10
@@ -379,11 +444,11 @@ export default {
 
       })
     },
-    checkGoodsDeil (id) {
-      this.$router.push({name: 'GoodsDetail', params: {id: id}})
+    checkGoodsDeil(id) {
+      this.$router.push({ name: 'GoodsDetail', params: { id: id } })
     },
-    goShopDetail (item) {
-      this.$router.push({name: 'ShopDetail', params: {id: item.storeId}})
+    goShopDetail(item) {
+      this.$router.push({ name: 'ShopDetail', params: { id: item.storeId } })
     }
   },
   watch: {
@@ -417,226 +482,227 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .disN {
-    width: 0.4rem;
-    height: 0.4rem;
-    margin-right: 0.2rem;
+.disN {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-right: 0.2rem;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.swipe-text {
+  z-index: 99;
+  position: fixed;
+  top: 2rem;
+  margin-top: 0.24rem;
+  margin-left: 0.16rem;
+  line-height: 1rem;
+  font-size: 0.24rem;
+  /*width:4.04rem;*/
+  height: 0.44rem;
+  background: rgba(0, 0, 0, 1);
+  opacity: 0.45;
+  border-radius: 0.22rem;
+  display: flex;
+  align-items: center;
+  /*justify-content: center;*/
+  img {
+    margin-left: 0.14rem;
+    margin-right: 0.1rem;
+    width: 0.24rem;
+    height: 0.2rem;
+    /*vertical-align: middle;*/
   }
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 1s;
+  .font {
+    margin-right: 0.1rem;
+    width: 100%;
+    height: 100%;
+    line-height: 0.4rem;
+    font-size: 0.2rem;
+    font-family: PingFang-SC-Medium;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 1);
+    flex-wrap: nowrap;
+    overflow: hidden;
   }
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-  }
-  .swipe-text {
-    z-index: 99;
-    position: fixed;
-    top: 2rem;
-    margin-top: 0.24rem;
-    margin-left: 0.16rem;
-    line-height: 1rem;
-    font-size: 0.24rem;
-    /*width:4.04rem;*/
-    height:0.44rem;
-    background:rgba(0,0,0,1);
-    opacity:0.45;
-    border-radius:0.22rem;
-    display: flex;
-    align-items: center;
-    /*justify-content: center;*/
-    img {
-      margin-left: 0.14rem;
-      margin-right: 0.1rem;
-      width: 0.24rem;
-      height: 0.2rem;
-      /*vertical-align: middle;*/
-    }
-    .font {
-      margin-right: 0.1rem;
-      width: 100%;
-      height: 100%;
-      line-height: 0.4rem;
-      font-size:0.2rem;
-      font-family:PingFang-SC-Medium;
-      font-weight:500;
-      color:rgba(255,255,255,1);
-      flex-wrap: nowrap;
-      overflow: hidden;
-    }
-  }
-  .cart {
-    .cartMain {
-      background: #f4f4f4;
-      .cartList {
-        background: #fff;
-        .no-goods {
-          padding-top: 2.8rem;
-          img {
-            margin: 0 auto;
-            width: 2rem;
-            height: 2rem;
-            display: block;
-          }
-          .tip {
-            text-align: center;
-            font-size:0.28rem;
-            font-family:PingFang-SC-Regular;
-            font-weight:400;
-            color:rgba(51,51,51,1);
-          }
-        }
-        .select {
-          margin-left: 0.2rem;
-          width: 0.64rem;
-          height: 0.64rem;
-        }
-        .cartList-title {
-          display: flex;
-          align-items: center;
-          width: 100%;
-          height: 0.9rem;
-          background: #fff;
-          font-size:0.3rem;
-          font-family:PingFang-SC-Medium;
-          font-weight:500;
-          color:rgba(51,51,51,1);
-          .cartList-title-img {
-            width: 0.36rem;
-            height: 0.36rem;
-            margin-right: 0.13rem;
-          }
-        }
-        .cartList-content {
-          display: flex;
-          align-items: center;
-          height: 2.42rem;
-          .good-img {
-            width: 1.68rem;
-            height: 1.4rem;
-            margin-right: 0.24rem;
-          }
-          .good-info {
-            height: 1.4rem;
-            .name {
-              font-size:0.28rem;
-              font-family:PingFang-SC-Medium;
-              font-weight:500;
-              color:rgba(51,51,51,1);
-              height: 0.4rem;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              display: -webkit-box;
-              -webkit-line-clamp: 1;
-              /* ! autoprefixer: off */
-              -webkit-box-orient: vertical;
-              /* autoprefixer: on */
-              margin-bottom: 0.2rem;
-            }
-            .desc {
-              font-size:0.24rem;
-              font-family:PingFang-SC-Medium;
-              font-weight:500;
-              color:rgba(153,153,153,1);
-              margin-bottom: 0.35rem;
-            }
-            .price {
-              font-size:0.18rem;
-              font-family:PingFang-SC-Medium;
-              font-weight:500;
-              color:rgba(227,58,89,1);
-            }
-            .number {
-              position: relative;
-              top: -0.6rem;
-              right: -2.5rem;
-            }
-            .shixiao {
-              position: relative;
-              top: -0.6rem;
-              left: 2.5rem;
-              text-align: center;
-              line-height: 0.5rem;
-              width:1.68rem;
-              height:0.5rem;
-              background:rgba(189,189,189,1);
-              border-radius:0.25rem;
-              font-size:0.24rem;
-              font-family:PingFang-SC-Regular;
-              font-weight:400;
-              color:rgba(255,255,255,1);
-            }
-          }
-        }
-        .delete {
-          width:1.6rem;
-          height:2.42rem;
-          background:rgba(227,58,89,1);
-          font-size:0.3rem;
-          font-family:PingFang-SC-Medium;
-          font-weight:500;
-          color:rgba(255,255,255,1);
-          text-align: center;
-          line-height: 2.42rem;
-        }
-      }
-    }
-    .cartFooter {
-      position: fixed;
-      align-items: center;
-      height:0.9rem;
-      background:rgba(255,255,255,1);
-      width: 100%;
-      bottom: 1rem;
-      display: flex;
-      border-top: 1px solid #f4f4f4;
-      .checkAll {
-        display: flex;
-        align-items: center;
-        font-size:0.28rem;
-        width: 1.5rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:rgba(51,51,51,1);
+}
+.cart {
+  .cartMain {
+    background: #f4f4f4;
+    .cartList {
+      background: #fff;
+      .no-goods {
+        padding-top: 2.8rem;
         img {
-          margin-left: 0.2rem;
-          width: 0.64rem;
-          height: 0.64rem;
+          margin: 0 auto;
+          width: 2rem;
+          height: 2rem;
+          display: block;
+        }
+        .tip {
+          text-align: center;
+          font-size: 0.28rem;
+          font-family: PingFang-SC-Regular;
+          font-weight: 400;
+          color: rgba(51, 51, 51, 1);
         }
       }
-      .freight {
-        margin-left: 0.5rem;
-        margin-right: 0.2rem;
-        font-size:0.24rem;
-        font-family:PingFang-SC-Regular;
-        font-weight:400;
-        color:rgba(136,136,136,1);
+      .select {
+        margin-left: 0.2rem;
+        width: 0.64rem;
+        height: 0.64rem;
       }
-      .Total {
+      .cartList-title {
         display: flex;
         align-items: center;
-        width:2.5rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        .name {
-          font-size:0.28rem;
-          color:rgba(51,51,51,1);
-        }
-        .price {
-          font-size:0.32rem;
-          color:#E4405E
+        width: 100%;
+        height: 0.9rem;
+        background: #fff;
+        font-size: 0.3rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(51, 51, 51, 1);
+        .cartList-title-img {
+          width: 0.36rem;
+          height: 0.36rem;
+          margin-right: 0.13rem;
         }
       }
-      .Settlement {
+      .cartList-content {
+        display: flex;
+        align-items: center;
+        height: 2.42rem;
+        .good-img {
+          width: 1.68rem;
+          height: 1.4rem;
+          margin-right: 0.24rem;
+        }
+        .good-info {
+          height: 1.4rem;
+          .name {
+            font-size: 0.28rem;
+            font-family: PingFang-SC-Medium;
+            font-weight: 500;
+            color: rgba(51, 51, 51, 1);
+            height: 0.4rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            /* ! autoprefixer: off */
+            -webkit-box-orient: vertical;
+            /* autoprefixer: on */
+            margin-bottom: 0.2rem;
+          }
+          .desc {
+            font-size: 0.24rem;
+            font-family: PingFang-SC-Medium;
+            font-weight: 500;
+            color: rgba(153, 153, 153, 1);
+            margin-bottom: 0.35rem;
+          }
+          .price {
+            font-size: 0.18rem;
+            font-family: PingFang-SC-Medium;
+            font-weight: 500;
+            color: rgba(227, 58, 89, 1);
+          }
+          .number {
+            position: relative;
+            top: -0.6rem;
+            right: -2.5rem;
+          }
+          .shixiao {
+            position: relative;
+            top: -0.6rem;
+            left: 2.5rem;
+            text-align: center;
+            line-height: 0.5rem;
+            width: 1.68rem;
+            height: 0.5rem;
+            background: rgba(189, 189, 189, 1);
+            border-radius: 0.25rem;
+            font-size: 0.24rem;
+            font-family: PingFang-SC-Regular;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 1);
+          }
+        }
+      }
+      .delete {
+        width: 1.6rem;
+        height: 2.42rem;
+        background: rgba(227, 58, 89, 1);
+        font-size: 0.3rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
         text-align: center;
-        line-height: 0.9rem;
-        width:1.8rem;
-        height:0.9rem;
-        background:rgba(255,81,122,1);
-        font-size:0.36rem;
-        font-family:PingFang-SC-Regular;
-        font-weight:400;
-        color:rgba(255,255,255,1);
+        line-height: 2.42rem;
       }
     }
   }
+  .cartFooter {
+    position: fixed;
+    align-items: center;
+    height: 0.9rem;
+    background: rgba(255, 255, 255, 1);
+    width: 100%;
+    bottom: 1rem;
+    display: flex;
+    border-top: 1px solid #f4f4f4;
+    .checkAll {
+      display: flex;
+      align-items: center;
+      font-size: 0.28rem;
+      width: 1.5rem;
+      font-family: PingFang-SC-Medium;
+      font-weight: 500;
+      color: rgba(51, 51, 51, 1);
+      img {
+        margin-left: 0.2rem;
+        width: 0.64rem;
+        height: 0.64rem;
+      }
+    }
+    .freight {
+      margin-left: 0.5rem;
+      margin-right: 0.2rem;
+      font-size: 0.24rem;
+      font-family: PingFang-SC-Regular;
+      font-weight: 400;
+      color: rgba(136, 136, 136, 1);
+    }
+    .Total {
+      display: flex;
+      align-items: center;
+      width: 2.5rem;
+      font-family: PingFang-SC-Medium;
+      font-weight: 500;
+      .name {
+        font-size: 0.28rem;
+        color: rgba(51, 51, 51, 1);
+      }
+      .price {
+        font-size: 0.32rem;
+        color: #e4405e;
+      }
+    }
+    .Settlement {
+      text-align: center;
+      line-height: 0.9rem;
+      width: 1.8rem;
+      height: 0.9rem;
+      background: rgba(255, 81, 122, 1);
+      font-size: 0.36rem;
+      font-family: PingFang-SC-Regular;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 1);
+    }
+  }
+}
 </style>

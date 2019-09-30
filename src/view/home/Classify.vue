@@ -89,8 +89,9 @@
           <!-- <div @click="goFreeShopping" v-show="freeShoppingShow" class="activity">
             <img v-if="bannerInfo" :src="bannerInfo.bannerUrl" alt />
           </div>-->
+          <!-- cashBackObj -->
           <top-title
-            v-if="cashBackObj"
+            v-if="false"
             title="0元购好物"
             rightShow
             :rightNumber="cashBackObj.totalAmount"
@@ -100,7 +101,10 @@
             class="span"
             v-show="isShow"
           >111</span>
-          <div class="back-box">
+          <div
+            v-if="false"
+            class="back-box"
+          >
             <div
               v-for="(item, x) in cashBackObj.items"
               :key="x"
