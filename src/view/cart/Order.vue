@@ -220,7 +220,8 @@ export default {
       addressInfo: {},
       addressList: [],
       shopList: [], // 店铺列表
-      orderGoodsBo: [] // 订单数组
+      orderGoodsBo: [], // 订单数组
+      orderWaring: false//订单出问题
     }
   },
   created() {
@@ -309,6 +310,7 @@ export default {
             this.goodId = res.data.content.orderGoodsBo[0].orderGoods.goodsId;
             this.cashBack = res.data.content.orderGoodsBo[0].orderGoods.cashBack;
           } else {
+            this.orderWaring = true;
             this.$toast(res.data.message);
           }
         })
@@ -319,6 +321,7 @@ export default {
           if (res.data.messageCode === 'MSG_1001') {
             this.shopList = res.data.content
           } else {
+            this.orderWaring = true;
             this.$toast(res.data.message)
           }
         })
@@ -332,6 +335,7 @@ export default {
       //   this.setPay = true
       //   return
       // }
+      if (this.orderWaring) return;
       if (this.goodsInfo.orderType == 3 || this.goodsInfo.orderType == 4) {
         this.freeShoppingPlaceOrder();
         return;
@@ -398,7 +402,7 @@ export default {
               }
             } else if (isAndroid) {
               if (window.wv) {
-                wv.pay(data.id)
+                wv.pay(data.id, this.goodsInfo.orderType);
               } else {
                 this.$router.replace({ name: 'Pay', params: { orderInfo: encodeURIComponent(JSON.stringify(data)) } })
               }

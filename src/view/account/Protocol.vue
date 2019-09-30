@@ -230,28 +230,8 @@
 <script>
 import TopNav from "@/components/TopNav";
 export default {
-  data() {
-    return {
-
-    };
-  },
   components: {
     TopNav
-  },
-  computed: {
-
-  },
-  watch: {
-
-  },
-  created() {
-
-  },
-  mounted() {
-
-  },
-  methods: {
-
   },
 };
 </script>

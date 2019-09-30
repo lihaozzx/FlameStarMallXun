@@ -65,7 +65,8 @@
           </van-swipe-item>
         </van-swipe>
         <div class="time-box">
-          <div class="number">{{hours.length > 1 ? hours[0] : 0}}</div>
+          <span class="time_text">活动已开始，快来参与吧!</span>
+          <!-- <div class="number">{{hours.length > 1 ? hours[0] : 0}}</div>
           <div class="number">{{hours.length > 1 ? hours[1] : hours[0]}}</div>
           <div class="word">时</div>
           <div class="number">{{minutes.length > 1 ? minutes[0] : 0}}</div>
@@ -76,7 +77,7 @@
           <div class="word">秒</div>
           <div class="number">{{haoSeconds.length > 1 ? haoSeconds[0] : 0}}</div>
           <div class="number">{{haoSeconds.length > 1 ? haoSeconds[1] : haoSeconds[0]}}</div>
-          <div class="word">毫秒</div>
+          <div class="word">毫秒</div> -->
         </div>
       </div>
       <div class="shop-detail">
@@ -124,7 +125,7 @@
           src="../../assets/home/ic_hint.png"
           alt
         />
-        <p>{{$route.query.type == 1?'成功邀请好友一起来拿可多得一次0元购机会哟':'活动仅支持微信绑定的信用卡支付，其他方式支付自动退款'}}</p>
+        <p>{{$route.query.type == 1?'成功邀请好友一起来拿可多得一次0元购机会哟':'微信支付时，请在支付方式内选择信用卡支付，其他方式支付自动退款。'}}</p>
       </div>
       <van-cell
         v-if="userInteractList && userInteractList.length > 0"
@@ -210,7 +211,7 @@
       <div
         @click="goPay"
         class="pay-btn"
-      >0元购</div>
+      >免费领取</div>
     </div>
     <van-dialog
       class="share-dialog"
@@ -293,7 +294,7 @@
       closeOnClickOverlay
       v-model="shareShow"
       :showConfirmButton="false"
-    >showCreditCardInfo: false,//信用卡使用信息
+    >
       <img
         id="shareImg"
         src
@@ -353,7 +354,7 @@
       :quota="1"
       :custom-stepper-config="{max: 1}"
       :show-add-cart-btn="false"
-      :buy-text="'申请0元购-Free Buy'"
+      :buy-text="'免费领取'"
       @buy-clicked="onBuyClicked"
     >
     </van-sku>
@@ -932,7 +933,7 @@ export default {
                 const goodsInfo = {
                   goodsId: this.goodsDetail.id,//商品id
                   stockId: skuData.selectedSkuComb.id,//规格id
-                  type: this.$route.query.type,//商品方式1零元购 1信用卡 3freebuy
+                  type: this.$route.query.type,//商品方式1零元购 2信用卡 3freebuy
                   orderType: this.$route.query.type == 1 ? 3 : this.$route.query.type == 2 ? 4 : 0,//3零元购 4信用卡
                   quantity: 1//购买数量
                 };
@@ -1055,7 +1056,6 @@ export default {
   padding-bottom: 1rem;
   max-width: 7.5rem;
   background-color: #fff;
-  background-image: url("../../assets/home/oval532.png");
   background-size: 100% auto;
   background-repeat: no-repeat;
   .title {
@@ -1065,6 +1065,18 @@ export default {
     font-family: PingFang-SC-Medium;
     font-weight: 500;
     color: rgba(255, 255, 255, 1);
+  }
+  .title::before {
+    width: 100%;
+    height: 4rem;
+    border-radius: 0.22rem 0.22rem 100% 100% / 0.22rem 0.22rem 3rem 3rem;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    background-color: rgb(248, 90, 83);
+    z-index: -1;
   }
   .info_box {
     width: 86%;
@@ -1204,6 +1216,11 @@ export default {
       line-height: 0.8rem;
       background: rgba(255, 186, 0, 1);
       border-radius: 0.4rem;
+      .time_text {
+        font-size: 0.4rem;
+        color: white;
+        font-weight: bold;
+      }
       .number {
         text-align: center;
         width: 0.44rem;

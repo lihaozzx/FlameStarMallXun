@@ -7,6 +7,7 @@
       id="snapshotZ"
     >
       <!-- 0元购 -->
+
       <div class="title">"Free Buy"，自由买，免费拿</div>
       <div class="info_box">
         <img
@@ -99,17 +100,17 @@
       <div class="chose_way">
         <div
           class="way_bas s1"
-          :class="showGoods == 1?'way_chosed':'way'"
-          @click="changeShowGoods(1)"
-        >
-          <span>新人免费领</span>
-        </div>
-        <div
-          class="way_bas s2"
           :class="showGoods == 2?'way_chosed':'way'"
           @click="changeShowGoods(2)"
         >
           <span>信用卡用户免费领</span>
+        </div>
+        <div
+          class="way_bas s2"
+          :class="showGoods == 1?'way_chosed':'way'"
+          @click="changeShowGoods(1)"
+        >
+          <span>新人免费领</span>
         </div>
         <div
           class="way_bas s3"
@@ -119,12 +120,13 @@
           <span>FreeBuy首单免费领</span>
         </div>
       </div>
-      <div class="description">每天10~11点 ,14~15点 ,21~22点三场，每场2000份</div>
+      <div class="description">{{showGoods==1?'每天10~11点 ,14~15点 ,21~22点三场，每场2000份':' '}}</div>
       <div class="zero_good_list_box_bg">
         <div class="zero_good_list_box">
           <!-- 2-进行中；3-已中断；4-已结束 -->
-          <p class="pf">{{showInfo.status==2?'据本场结束 '+outCountdown:showInfo.status==3?'活动暂时中断，请等待哦':showInfo.status==4?'活动已经结束':'活动暂未开始，请等待哦'}}</p>
-          <p class="ps">需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。</p>
+          <!-- +outCountdown -->
+          <p class="pf">{{showInfo.status==2?'活动已开始，快来参与吧!':showInfo.status==3?'活动暂时中断，请等待哦':showInfo.status==4?'活动已经结束':'活动暂未开始，请等待哦'}}</p>
+          <p class="ps">{{showGoods==1?'需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。':'需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。'}}</p>
           <div class="zero_good_list">
             <div class="box">
               <div
@@ -257,17 +259,13 @@ export default {
       minutes: [],
       seconds: [],
       haoSeconds: [],
-      showGoods: 1,
+      showGoods: 2,
     };
   },
   created() {
-    if (window.wv) {
-      window.wv.initDataZero(0, 1);
-    }
     if (this.$route.query.type) {
       this.showGoods = this.$route.query.type;
     }
-
     this.show = !localStorage.getItem("zeroTwo");
     localStorage.setItem("zeroTwo", true);
     this.getWeChatSnapshot();
@@ -285,6 +283,12 @@ export default {
     } else {
       this.$store.commit(types.SET_INVITER_CODE, ""); // 直接调用mutations改变值（不可异步）
       this.goHomeShow = false;
+    }
+    if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.initDataZero) {
+      window.webkit.messageHandlers.initDataZero.postMessage(0, 2);
+    }
+    if (window.wv) {
+      window.wv.initDataZero(0, 2);
     }
   },
   computed: {
@@ -323,6 +327,9 @@ export default {
   },
   methods: {
     goZeroDetail(item) {
+      if (window.webkit && window.webkit.messageHandlers.goLogin) {
+        window.webkit.messageHandlers.goToDetail.postMessage(this.showGoods, item.id);//id,type
+      }
       if (window.wv) {
         window.wv.goToDetail(item.id, this.showGoods);
       }
@@ -466,6 +473,7 @@ export default {
           document.getElementById("shareImgC").src = url;
           _this.sDomShowC = false;
         });
+
         /* let width = dom.offsetWidth;
         let height = dom.offsetHeight;
         let canvas = document.createElement("canvas");
@@ -490,13 +498,21 @@ export default {
           document.getElementById("shareImgC").src = url;
           _this.sDomShowC = false;
         }); */
-      } else {
+      } else if (this.showGoods == 3) {
         return;
       }
     },
     changeShowGoods(k) {
+      if (window.webkit && window.webkit.messageHandlers.goLogin) {
+        window.webkit.messageHandlers.chageType.postMessage(k);
+      }
       if (window.wv) {
+        console.log(123);
         window.wv.chageType(k);
+      }
+
+      if (k == 3) {
+        this.$toast('活动即将上线');
       }
       this.showGoods = k;
     }
@@ -748,6 +764,7 @@ export default {
     color: #ff607b;
     display: flex;
     justify-content: center;
+    white-space: pre;
   }
   .list-box {
     width: 6.9rem;
@@ -1072,7 +1089,6 @@ export default {
   padding-bottom: 1rem;
   max-width: 7.5rem;
   background-color: #fff;
-  background-image: url("../../assets/home/oval532.png");
   background-size: 100% auto;
   background-repeat: no-repeat;
   .title {
@@ -1082,6 +1098,18 @@ export default {
     font-family: PingFang-SC-Medium;
     font-weight: 500;
     color: rgba(255, 255, 255, 1);
+  }
+  .title::before {
+    width: 100%;
+    height: 4rem;
+    border-radius: 0.22rem 0.22rem 100% 100% / 0.22rem 0.22rem 3rem 3rem;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    background-color: rgb(248, 90, 83);
+    z-index: -1;
   }
   .info_box {
     width: 86%;
