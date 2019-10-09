@@ -7,7 +7,6 @@
           v-if="show"
           id="snapshot"
         >
-          <!-- 0元购 -->
           <div class="title">"Free Buy"，自由买，免费拿</div>
           <div class="info_box">
             <img
@@ -36,6 +35,7 @@
             <div class="snapshot-tips">{{info.desc}}</div>
           </div>
           <img
+            v-if="info.appletQrCodeUrl"
             class="solar-code"
             :src="info.appletQrCodeUrl"
             alt
@@ -633,10 +633,37 @@ export default {
       };
       wxApi.weChatSnapshot(data).then(res => {
         this.info = res.data.content;
+        this.convertImgToBase64(this.info.appletQrCodeUrl)
+          .then(url => {
+            this.info.appletQrCodeUrl = url;
+          })
+          .catch(_ => this.info.appletQrCodeUrl = '');
         // setTimeout(() => {
         //   this.snapshot()
         // }, 1000)
       });
+    },
+    /**
+     * 解决canvas图片跨域
+     * 转base64
+     */
+    convertImgToBase64(url) {
+      return new Promise((resolve, reject) => {
+        let canvas = document.createElement('CANVAS');
+        let ctx = canvas.getContext('2d');
+        let img = new Image;
+        img.crossOrigin = 'Anonymous';//canvas请求跨域
+        img.onload = _ => {
+          canvas.height = img.height;
+          canvas.width = img.width;
+          ctx.drawImage(img, 0, 0);
+          let dataURL = canvas.toDataURL('image/png');
+          canvas = null;
+          resolve(dataURL);
+        };
+        img.onerror = _ => reject();
+        img.src = url;
+      })
     },
     parseValue: function (value) {
       return parseInt(value, 10);
@@ -664,13 +691,12 @@ export default {
       }
     },
     snapshot() {
-      let _this = this;
-      _this.shareShow = true;
+      this.shareShow = true;
       let dom = document.getElementById("snapshot");
       if (!dom) return;
       dom2image.toPng(dom).then(url => {
         document.getElementById("shareImg").src = url;
-        _this.show = false;
+        this.show = false;
       });
 
       /* let _this = this;
@@ -851,22 +877,20 @@ export default {
       const data = {
         id: this.$route.params.id
       };
-      const self = this;
       homeApi.getGoodsDeil(data).then(res => {
         if (res.data.messageCode === "MSG_1001") {
-          self.failure = false;
+          this.failure = false;
           this.goodsDetail = res.data.content;
           const arr = [];
-          this.goodsDetail &&
-            this.goodsDetail.specs.forEach((v, i) => {
-              const obj = {};
-              obj.k = v.name;
-              obj.v = v.items;
-              obj.k_s = "s" + i;
-              arr.push(obj);
-              this.initialSku[obj.k_s] = v.items[0].id;
-              this.initialSku["selectedNum"] = 1;
-            });
+          this.goodsDetail && this.goodsDetail.specs.forEach((v, i) => {
+            const obj = {};
+            obj.k = v.name;
+            obj.v = v.items;
+            obj.k_s = "s" + i;
+            arr.push(obj);
+            this.initialSku[obj.k_s] = v.items[0].id;
+            this.initialSku["selectedNum"] = 1;
+          });
           this.sku.tree = arr;
           const arr2 = [];
           const obj = this.goodsDetail.stockDetail;
@@ -926,7 +950,7 @@ export default {
           this.goodsImgList = res.data.content && res.data.content.imageUrls;
           this.getCategoriesGoods();
         } else {
-          self.failure = true;
+          this.failure = true;
         }
       });
     },
@@ -1384,7 +1408,6 @@ export default {
       display: block;
       margin-right: 0.2rem;
       margin-left: 0.2rem;
-      vertical-align: middle;
     }
     .font {
       font-size: 0.24rem;
@@ -1700,7 +1723,6 @@ export default {
     display: block;
     margin-right: 0.2rem;
     margin-left: 0.2rem;
-    vertical-align: middle;
   }
   .font {
     font-size: 0.24rem;

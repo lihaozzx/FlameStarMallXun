@@ -344,7 +344,7 @@ export default {
     }
     this.getSwipeList();
     this.getBestChoice();
-    this.getCashBack();
+    // this.getCashBack();//零元购商品
     this.getLowPrice();
     this.getTopSales();
     this.getFreeShopping();
@@ -353,6 +353,9 @@ export default {
     this.getMessageShuffling();
   },
   methods: {
+    /**
+     * 轮播购买文字
+     */
     getMessageShuffling() {
       const data = {
         pageNumber: 1,
@@ -370,11 +373,17 @@ export default {
         }
       }, 3000);
     },
+    /**
+     * 零元购入口
+     */
     getZeroBanner() {
       homeApi.getfreeShoppingEntry().then(res => {
         this.bannerInfo = res.data.content;
       });
     },
+    /**
+     * 是否设置过支付密码
+     */
     getPaymentPasswordStatus() {
       mineApi.getPaymentPasswordStatus().then(res => {
         if (res.data.content === 1) {
@@ -383,6 +392,9 @@ export default {
         }
       });
     },
+    /**
+     * 页面跳转
+     */
     goPage(forwardDest, forwardParam) {
       // // forwardDest1-商品详情页；2-商品一级分类页；3-商品二级分类页；4-会员页；5-话题分类页；6-话题详情页；7-充值页；8-商家入驻页
       switch (forwardDest) {
@@ -393,7 +405,7 @@ export default {
           });
           break;
         case 2:
-          console.dir(this.categoriesList);
+          // console.dir(this.categoriesList);
           this.categoryId = forwardParam;
           this.categoriesList.forEach((v, i) => {
             if (v.id === forwardParam) {
@@ -437,6 +449,9 @@ export default {
     goAllBack(item) {
       this.$router.push({ name: "AllBack", params: { id: item.id } });
     },
+    /**
+     * 零元购详情
+     */
     getFreeShopping() {
       const data = {
         mode: 1,
@@ -448,16 +463,25 @@ export default {
         }
       });
     },
+    /**
+     * 口碑榜
+     */
     getTopSales() {
       homeApi.getTopSales().then(res => {
         this.topSalesList = res.data.content;
       });
     },
+    /**
+     * 性价比
+     */
     getLowPrice() {
       homeApi.getLowPrice().then(res => {
         this.lowPriceList = res.data.content;
       });
     },
+    /**
+     * 返现购
+     */
     getCashBack() {
       const data = {
         statistic: 1,
@@ -468,6 +492,9 @@ export default {
         this.cashBackObj = res.data.content;
       });
     },
+    /**
+     * 主页商品
+     */
     getBestChoice(type) {
       if (type === "pullUp") {
         this.pageNumber++;
@@ -496,12 +523,17 @@ export default {
       }
       console.log(this.pageNumber);
     },
+    /**
+     * vant-list加载更多
+     */
     onLoad() {
-      let self = this;
-      setTimeout(() => {
-        self.getBestChoice("pullUp");
+      setTimeout(_ => {
+        this.getBestChoice("pullUp");
       }, 100);
     },
+    /**
+     * 切换分类
+     */
     categorieschange(index, title) {
       this.categoryId = this.categoriesList[index].id;
       localStorage.setItem("categoryId", this.categoryId);
@@ -516,6 +548,9 @@ export default {
         this.getCategoriesList(-1);
       }
     },
+    /**
+     * 轮播图
+     */
     getSwipeList() {
       const data = {
         slideShowCategory: this.categoryId === 0 ? 1 : 2,
@@ -526,6 +561,9 @@ export default {
         this.swipeList = res.data.content;
       });
     },
+    /**
+     * 商品分类
+     */
     getCategoriesList(val) {
       if (val === 1) {
         homeApi.getCategoriesList().then(res => {

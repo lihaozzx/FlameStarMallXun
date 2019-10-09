@@ -52,7 +52,7 @@ router.beforeEach((to, from, next) => {
     });
   } else if (to.name === "ZeroShopDetail") {
     const url = params.testEnvironmentHost + "/#" + to.fullPath;
-    // console.log(to.fullPath.split('/')[2])
+    console.log(to.fullPath.split("/")[2]);
     const data2 = {
       mode: to.query.type == 1 ? 2 : 7,
       targetId: to.params.id
@@ -70,7 +70,7 @@ router.beforeEach((to, from, next) => {
           linkurl: uri,
           img: res.data.content.imageUrl
         };
-        // console.log(res)
+        console.log(res);
         sdk.getJSSDK(url, obj, data2.mode);
       }
     });

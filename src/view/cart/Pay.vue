@@ -1,101 +1,133 @@
 <template>
- <div class="pay-oder">
-   <TopNav name="支付订单"></TopNav>
-   <div class="pay-time">
-     <div class="content">
-       <div v-if="orderInfo.cashBack > 0" class="money">
-         <span class="font1">支付</span>
-         <span class="font2">￥</span>
-         <span class="font1">{{orderInfo.paymentAmount}}返</span>
-         <span class="font2">￥</span>
-         <span class="font1">{{orderInfo.cashBack}}</span>
-       </div>
-       <div v-else class="money">
-         <span class="font2">￥</span>
-         <span class="font1">{{orderInfo.paymentAmount}}</span>
-       </div>
-       <div v-if="payTimeFormat" class="time">
-         支付剩余时间
-         <span>{{payTimeFormat}}</span>
-       </div>
-     </div>
-   </div>
-   <van-radio-group class="cell-radio" v-model="radio">
-     <van-cell-group>
-       <van-cell title="余额支付" :label="'余额:￥' + myInfo.balance" clickable @click="changeRadio('1')">
-         <img
-           slot="icon"
-           src="../../assets/order/order_yhk_icon.png"
-           style="width: 0.4rem;height: 0.4rem;margin-right: 0.3rem;margin-top: 0.2rem"
-         />
-         <van-radio checked-color="#FF6417" :disabled="orderInfo.isTopUp" name="1">
-         </van-radio>
-       </van-cell>
-       <van-cell title="微信支付" clickable @click="changeRadio('2')">
-         <img
-           slot="icon"
-           src="../../assets/order/order_weixin_icon.png"
-           style="line-height: inherit;width: 0.4rem;height: 0.4rem;margin-right: 0.3rem"
-         />
-         <van-radio checked-color="#FF6417" :disabled="orderInfo.paymentAmount === 0 || orderInfo.paymentAmount === '0'" name="2">
-           <!--<img-->
-           <!--slot="icon"-->
-           <!--slot-scope="props"-->
-           <!--:src="props.checked ? icon.active : icon.normal"-->
-           <!--&gt;-->
-         </van-radio>
-       </van-cell>
-     </van-cell-group>
-   </van-radio-group>
-   <van-button @click="confirm" class="confirm">确认支付</van-button>
-   <van-popup
-     class="showKeyboard"
-     v-model="show"
-     position="bottom"
-     overlay
-   >
-     <van-password-input
-       :length="6"
-       :value="value"
-       info="密码为 6 位数字"
-       :error-info="errorInfo"
-       @focus="showKeyboard = true"
-     ></van-password-input>
-     <van-number-keyboard
-       show
-       :maxlength="6"
-       @input="onInput"
-       @delete="onDelete"
-       @blur="hide"
-     ></van-number-keyboard>
-   </van-popup>
-   <van-dialog
-     v-model="show2"
-     title="提示"
-     message="如果使用微信支付，请用外部浏览器打开支付"
-     :show-cancel-button="false"
-   >
-   </van-dialog>
-   <van-dialog
-     v-model="balanceShow"
-     title="提示"
-     message="当前余额不足无法支付，建议您先去充值后再进行操作"
-     show-cancel-button
-     confirm-button-text="去充值"
-     @confirm="goAddMoney"
-   >
-   </van-dialog>
-   <van-dialog
-     title="提示"
-     message="为了您账户余额安全，请您先设置账户支付密码哦！"
-     closeOnClickOverlay
-     v-model="setPay"
-     show-cancel-button
-     confirm-button-color="#FF517A"
-     @confirm="$router.push({name: 'PlayPassword'})"
-   >
-   </van-dialog>
- </div>
+  <div class="pay-oder">
+    <TopNav name="支付订单"></TopNav>
+    <div class="pay-time">
+      <div class="content">
+        <div
+          v-if="orderInfo.cashBack > 0"
+          class="money"
+        >
+          <span class="font1">支付</span>
+          <span class="font2">￥</span>
+          <span class="font1">{{orderInfo.paymentAmount}}返</span>
+          <span class="font2">￥</span>
+          <span class="font1">{{orderInfo.cashBack}}</span>
+        </div>
+        <div
+          v-else
+          class="money"
+        >
+          <span class="font2">￥</span>
+          <span class="font1">{{orderInfo.paymentAmount}}</span>
+        </div>
+        <div
+          v-if="payTimeFormat"
+          class="time"
+        >
+          支付剩余时间
+          <span>{{payTimeFormat}}</span>
+        </div>
+      </div>
+    </div>
+    <van-radio-group
+      class="cell-radio"
+      v-model="radio"
+    >
+      <van-cell-group>
+        <van-cell
+          title="余额支付"
+          :label="'余额:￥' + myInfo.balance"
+          clickable
+          @click="changeRadio('1')"
+        >
+          <img
+            slot="icon"
+            src="../../assets/order/order_yhk_icon.png"
+            style="width: 0.4rem;height: 0.4rem;margin-right: 0.3rem;margin-top: 0.2rem"
+          />
+          <van-radio
+            checked-color="#FF6417"
+            :disabled="orderInfo.isTopUp"
+            name="1"
+          >
+          </van-radio>
+        </van-cell>
+        <van-cell
+          title="微信支付"
+          clickable
+          @click="changeRadio('2')"
+        >
+          <img
+            slot="icon"
+            src="../../assets/order/order_weixin_icon.png"
+            style="line-height: inherit;width: 0.4rem;height: 0.4rem;margin-right: 0.3rem"
+          />
+          <van-radio
+            checked-color="#FF6417"
+            :disabled="orderInfo.paymentAmount === 0 || orderInfo.paymentAmount === '0'"
+            name="2"
+          >
+            <!--<img-->
+            <!--slot="icon"-->
+            <!--slot-scope="props"-->
+            <!--:src="props.checked ? icon.active : icon.normal"-->
+            <!--&gt;-->
+          </van-radio>
+        </van-cell>
+      </van-cell-group>
+    </van-radio-group>
+    <van-button
+      @click="confirm"
+      class="confirm"
+    >确认支付</van-button>
+    <van-popup
+      class="showKeyboard"
+      v-model="show"
+      position="bottom"
+      overlay
+    >
+      <van-password-input
+        :length="6"
+        :value="value"
+        info="密码为 6 位数字"
+        :error-info="errorInfo"
+        @focus="showKeyboard = true"
+      ></van-password-input>
+      <van-number-keyboard
+        show
+        :maxlength="6"
+        @input="onInput"
+        @delete="onDelete"
+        @blur="hide"
+      ></van-number-keyboard>
+    </van-popup>
+    <van-dialog
+      v-model="show2"
+      title="提示"
+      message="如果使用微信支付，请用外部浏览器打开支付"
+      :show-cancel-button="false"
+    >
+    </van-dialog>
+    <van-dialog
+      v-model="balanceShow"
+      title="提示"
+      message="当前余额不足无法支付，建议您先去充值后再进行操作"
+      show-cancel-button
+      confirm-button-text="去充值"
+      @confirm="goAddMoney"
+    >
+    </van-dialog>
+    <van-dialog
+      title="提示"
+      message="为了您账户余额安全，请您先设置账户支付密码哦！"
+      closeOnClickOverlay
+      v-model="setPay"
+      show-cancel-button
+      confirm-button-color="#FF517A"
+      @confirm="$router.push({name: 'PlayPassword'})"
+    >
+    </van-dialog>
+  </div>
 
 </template>
 
@@ -109,7 +141,7 @@ export default {
   components: {
     TopNav
   },
-  data () {
+  data() {
     return {
       radio: '1',
       show: false,
@@ -127,7 +159,7 @@ export default {
       myInfo: {}
     }
   },
-  created () {
+  created() {
     this.getPaymentPasswordStatus()
     if (localStorage.getItem('isWeiXin') === 'true') {
       window.location.href = window.location.href + '&wxr=' + new Date().getTime()
@@ -149,7 +181,7 @@ export default {
     }
   },
   methods: {
-    getPaymentPasswordStatus () {
+    getPaymentPasswordStatus() {
       mineApi.getPaymentPasswordStatus().then(res => {
         if (res.data.content === 1) {
           this.isOldPasword = true
@@ -162,21 +194,21 @@ export default {
       window.location.href = url
       // window.history.replaceState({}, document.title, url)
     },
-    goAddMoney () {
-      this.$router.replace({name: 'AddMoney'})
+    goAddMoney() {
+      this.$router.replace({ name: 'AddMoney' })
     },
-    getMyInfo () {
+    getMyInfo() {
       mineApi.getMyInfo().then(res => {
         this.myInfo = res.data.content
       })
     },
-    changeRadio (v) {
+    changeRadio(v) {
       if (!this.orderInfo.isTopUp) {
         this.radio = v
         console.log(this.radio)
       }
     },
-    getPayTime () {
+    getPayTime() {
       let endTime = this.orderInfo.createTime + 15 * 60 * 1000
       let clientTime = new Date()
       let lastTime = (endTime - clientTime) / 1000
@@ -197,29 +229,29 @@ export default {
           } else {
             second = '0' + secondTime
           }
-          // console.log(secondTime > 9)
+          console.log(secondTime > 9)
           this.payTimeFormat = `${minute}:${second}`
         } else {
           clearInterval(interval2)
           this.payTimeFormat = ''
-          this.$router.replace({name: 'OrderList', params: {active: 12}})
+          this.$router.replace({ name: 'OrderList', params: { active: 12 } })
         }
       }, 1000)
     },
-    onInput (key) {
+    onInput(key) {
       if (this.errorInfo.indexOf('重试') !== -1) {
         return
       }
       this.value = (this.value + key).slice(0, 6)
     },
-    hide () {
+    hide() {
       this.value = ''
       this.showKeyboard = false
     },
-    onDelete () {
+    onDelete() {
       this.value = this.value.slice(0, this.value.length - 1)
     },
-    confirm () {
+    confirm() {
       console.log(this.radio)
       if (!this.isOldPasword && this.radio === '1') {
         this.setPay = true
@@ -237,7 +269,7 @@ export default {
         }
       }
     },
-    payment () {
+    payment() {
       // if (this.orderInfo.paymentAmount === 0) {
       //   // this.$router.replace({name: 'OrderList', params: {active: 2}})
       // } else {
@@ -262,7 +294,7 @@ export default {
             // window.location.replace(url)
           } else {
             if (res.data.content.balance.success === 1) {
-              this.$router.replace({name: 'OrderList', params: {active: 2}})
+              this.$router.replace({ name: 'OrderList', params: { active: 2 } })
             } else if (res.data.content.balance.remainingCount > 0) {
               this.value = ''
               this.errorInfo = `密码错误，你还剩余${res.data.content.balance.remainingCount}次机会`
@@ -279,13 +311,13 @@ export default {
       })
       // }
     },
-    setCookie (cname, cvalue, exdays) {
+    setCookie(cname, cvalue, exdays) {
       let d = new Date()
       d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
       let expires = 'expires=' + d.toGMTString()
       document.cookie = cname + '=' + cvalue + ';' + expires
     },
-    getPayTime2 (finalFailedTime) {
+    getPayTime2(finalFailedTime) {
       let lastTime = finalFailedTime / 1000
       let interval = setInterval(() => {
         if (lastTime > 0) {
@@ -301,7 +333,7 @@ export default {
     }
   },
   watch: {
-    value (v) {
+    value(v) {
       if (v !== null && v.length === 6) {
         this.payment()
       }
@@ -316,9 +348,9 @@ export default {
   height: 13.33rem;
   .pay-time {
     padding: 0.1rem 0;
-    width:100%;
-    height:2.5rem;
-    background:rgba(255,255,255,1);
+    width: 100%;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 1);
     .content {
       margin: 0.5rem auto;
       /*width: 3rem;*/
@@ -329,25 +361,25 @@ export default {
         justify-content: center;
         align-items: center;
         .font1 {
-          font-size:0.6rem;
-          font-family:PingFang-SC-Bold;
-          font-weight:bold;
-          color:rgba(51,51,51,1);
+          font-size: 0.6rem;
+          font-family: PingFang-SC-Bold;
+          font-weight: bold;
+          color: rgba(51, 51, 51, 1);
         }
-       .font2 {
-         font-size:0.36rem;
-         font-family:PingFang-SC-Bold;
-         font-weight:bold;
-         color:rgba(51,51,51,1);
-       }
+        .font2 {
+          font-size: 0.36rem;
+          font-family: PingFang-SC-Bold;
+          font-weight: bold;
+          color: rgba(51, 51, 51, 1);
+        }
       }
       .time {
-        font-size:0.22rem;
-        font-family:PingFang-SC-Regular;
-        font-weight:400;
-        color:rgba(153,153,153,1);
+        font-size: 0.22rem;
+        font-family: PingFang-SC-Regular;
+        font-weight: 400;
+        color: rgba(153, 153, 153, 1);
         span {
-          color: #FF8D12;
+          color: #ff8d12;
         }
       }
     }
@@ -358,14 +390,14 @@ export default {
   .confirm {
     margin: 0.6rem auto;
     display: block;
-    width:6.9rem;
-    height:0.8rem;
-    background:rgba(255,81,122,1);
-    border-radius:0.4rem;
-    font-size:0.32rem;
-    font-family:PingFang-SC-Medium;
-    font-weight:500;
-    color:rgba(255,255,255,1);
+    width: 6.9rem;
+    height: 0.8rem;
+    background: rgba(255, 81, 122, 1);
+    border-radius: 0.4rem;
+    font-size: 0.32rem;
+    font-family: PingFang-SC-Medium;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 1);
   }
   .showKeyboard {
     height: 8.5rem;

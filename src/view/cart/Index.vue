@@ -2,7 +2,7 @@
   <div class="cart">
     <!--<TopNav name="购物车" :backShow="false"></TopNav>-->
     <div class="cartMain">
-      <transition name="fade">
+      <!-- <transition name="fade">
         <div
           v-if="visibel"
           class="swipe-text"
@@ -13,7 +13,7 @@
           >
           <div class="font">{{messageShuffling}}</div>
         </div>
-      </transition>
+      </transition> -->
       <ul>
         <li
           v-for="shop in carts"
@@ -189,9 +189,12 @@ export default {
   },
   created() {
     this.getShoppingCart()
-    this.getMessageShuffling()
+    // this.getMessageShuffling()
   },
   methods: {
+    /**
+     * 购物消息
+     */
     getMessageShuffling() {
       const data = {
         pageNumber: 1,
@@ -348,7 +351,8 @@ export default {
       let newArr = []
       for (let i = 0; i < input.length; i++) {
         if (input[i].name == 'goodRadio' && input[i].checked) {
-          let num = input[i].getAttribute('num')
+          let num = input[i].getAttribute('num');
+
           newArr.push(
             {
               'price': input[i].getAttribute('price'),
@@ -441,7 +445,6 @@ export default {
         this.$nextTick(() => {
           this.caculate()
         })
-
       })
     },
     checkGoodsDeil(id) {
@@ -531,6 +534,8 @@ export default {
   }
 }
 .cart {
+  height: calc(100vh - 0.9rem - 50px);
+  overflow: scroll;
   .cartMain {
     background: #f4f4f4;
     .cartList {

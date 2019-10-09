@@ -45,6 +45,8 @@ const UserSwitch = _ => import("@/view/mine/UserSwitch");
 const Test = _ => import("@/view/Test");
 const Test2 = _ => import("@/view/Test2");
 const PlayPlay = _ => import("@/view/PlayPlay");
+const FreeBuy = _ => import("@/view/activity/freeBuy");
+
 Vue.use(Router);
 
 export default new Router({
@@ -313,9 +315,12 @@ export default new Router({
       component: UserSwitch
     },
     {
-      path: "/",
-      name: "Home",
-      component: Home
+      path: "/freeBuy",
+      name: "freeBuy",
+      component: FreeBuy,
+      meta: {
+        tourists: true
+      }
     }
   ],
   scrollBehavior(to, from, savedPosition) {

@@ -843,36 +843,24 @@ export default {
       });
     },
     setSku() {
-      let index = 0;
       for (let i = 0; i < this.goodsDetail.specs.length; i++) {
         let el = this.goodsDetail.specs[i];
         let a = { k: el.name, v: [], k_s: `s${i}` }
-        for (let j = 0; j < el.items.length; j++) {
-          let jel = el.items[j];
+        el.items.forEach(jel => {
           a.v.push({ id: jel.id, name: jel.name, imgUrl: jel.iconUrl });
-        }
+        });
         this.sku.tree.push(a);
       }
 
       for (let i = 0; i < this.goodsDetail.specs.length; i++) {
         if (this.goodsDetail.specs[i]) {
+          //初始化选择
           this.initialSku['s' + i] = this.goodsDetail.specs[i].items[0].id || 0;
+          this.sku.price += (i == 0 ? '' : ',') + this.initialSku['s' + i];
         }
       }
 
-      let pkey = '';
-      let index3 = 0;
-      while (true) {
-        if (this.initialSku['s' + index3]) {
-          pkey += (index3 > 0 ? ',' : '') + this.initialSku['s' + index3];
-          index3++;
-        } else {
-          break;
-        }
-      }
-
-      this.sku.price = this.goodsDetail.stockDetail[pkey].dctPrice;
-      this.sku.stock_num = this.stockQuantity;
+      this.sku.stock_num = this.stockQuantity;//总库存
 
       this.goods = {
         // 商品标题
@@ -880,8 +868,6 @@ export default {
         // 默认商品 sku 缩略图
         picture: this.goodsDetail.imageUrls[0]
       }
-
-      let arr = [];
 
       for (const sdet in this.goodsDetail.stockDetail) {
         if (this.goodsDetail.stockDetail.hasOwnProperty(sdet)) {
@@ -896,11 +882,9 @@ export default {
               obj['s' + i] = sa[i];
             }
           }
-          arr.push(obj);
+          this.sku.list.push(obj);
         }
       }
-
-      this.sku.list = arr;
     },
     goEvaluation() {
       this.$router.push({
@@ -1026,13 +1010,14 @@ export default {
     },
     /**
      * 解决canvas图片跨域
+     * 转base64
      */
     convertImgToBase64(url) {
       return new Promise((resolve, reject) => {
-        let canvas = document.createElement('CANVAS'),
-          ctx = canvas.getContext('2d'),
-          img = new Image;
-        img.crossOrigin = 'Anonymous';
+        let canvas = document.createElement('CANVAS');
+        let ctx = canvas.getContext('2d');
+        let img = new Image;
+        img.crossOrigin = 'Anonymous';//canvas请求跨域
         img.onload = function () {
           canvas.height = img.height;
           canvas.width = img.width;

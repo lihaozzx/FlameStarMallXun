@@ -254,15 +254,17 @@ export default {
       goHomeShow: false,
       countDown: null,
       countDown2: null,
+      countDown3: null,
       zeroInfo: {},
       creditInfo: {},
+      freeInfo: {},
       hours: [],
       minutes: [],
       seconds: [],
       haoSeconds: [],
       showGoods: 2,
       zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ''],
-      zeroActivityText: ['', '', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束', '活动暂未开始，请等待哦'],
+      zeroActivityText: ['', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束'],
     };
   },
   created() {
@@ -275,6 +277,7 @@ export default {
     this.getWeChatSnapshot2();
     this.getFreeShopping();
     this.getFreeShopping2();
+    this.getFreeShopping3();
 
     if (window.location.href.split("inviterCode=")[1]) {
       this.goHomeShow = true;
@@ -322,9 +325,7 @@ export default {
       } else if (this.showGoods == 2) {
         return this.creditInfo;
       } else {
-        return {
-          goodsItems: []
-        }
+        return this.freeInfo;
       }
     }
   },
@@ -381,6 +382,30 @@ export default {
               this.formatDuring(this.countDown2);
             } else {
               clearInterval(interval2);
+            }
+          }, 1000);
+        }
+      });
+    },
+    /**
+     *freebuy用户免费领
+     */
+    getFreeShopping3() {
+      const data = {
+        mode: 2,
+        type: 3
+      };
+      homeApi.getFreeShopping(data).then(res => {
+        if (res.data.content) {
+          this.freeInfo = res.data.content;
+          this.countDown3 = this.freeInfo.remainingTime;
+          this.formatDuring(this.countDown3);
+          let interval3 = setInterval(() => {
+            if (this.countDown3 > 0) {
+              this.countDown3 -= 1000;
+              this.formatDuring(this.countDown3);
+            } else {
+              clearInterval(interval3);
             }
           }, 1000);
         }
@@ -512,10 +537,6 @@ export default {
       if (window.wv) {
         console.log(123);
         window.wv.chageType(k);
-      }
-
-      if (k == 3) {
-        this.$toast('活动即将上线');
       }
       this.showGoods = k;
     }
