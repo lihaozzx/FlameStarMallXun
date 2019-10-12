@@ -86,5 +86,11 @@ export default {
   getTextSlideShow(data) {
     // 购买商品文字轮播信息
     return axios.get(`${params.base_url}/home/textSlideShow`, { params: data });
+  },
+  /**
+   * 查询活动基础信息
+   */
+  getFreebuyVideo(data) {
+    return axios.get(`${params.base_url}/home/activity/freeBuy`, { params: data });
   }
 };

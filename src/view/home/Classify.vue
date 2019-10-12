@@ -26,20 +26,20 @@
             <div class="font">{{messageShuffling}}</div>
           </div>
         </transition>
-        <!--        <van-swipe-->
-        <!--          :duration="2000"-->
-        <!--          v-if="messageShufflingList.length > 0"-->
-        <!--          class="swipe-text"-->
-        <!--          :show-indicators="false"-->
-        <!--          :autoplay="3000"-->
-        <!--          indicator-color="#FF517A">-->
-        <!--          <van-swipe-item-->
-        <!--            v-for="(item, index) in messageShufflingList"-->
-        <!--            :key="index"-->
-        <!--          >-->
-        <!--           {{item}}-->
-        <!--          </van-swipe-item>-->
-        <!--        </van-swipe>-->
+        <!--        <van-swipe
+          :duration="2000"
+          v-if="messageShufflingList.length > 0"
+          class="swipe-text"
+                  :show-indicators="false"
+                  :autoplay="3000"
+                  indicator-color="#FF517A">
+                  <van-swipe-item
+                    v-for="(item, index) in messageShufflingList"
+                    :key="index"
+                  >
+                   {{item}}
+                  </van-swipe-item>
+               </van-swipe>-->
         <van-swipe
           v-if="swipeList.length > 0"
           class="swipe"
@@ -209,6 +209,7 @@
           </div>
         </div>
         <top-title
+          id="xiaoliang"
           v-if="categoryId === 0"
           title="销量排行榜"
           :src="topTitle[3].url"
@@ -283,7 +284,7 @@
 </template>
 
 <script>
-import homeApi from "@/api/home";
+import homeApi from "../../api/home";
 import mineApi from "@/api/mine";
 import Conditions from "./com/Conditions";
 import TopTitle from "./com/TopTitle";
@@ -351,6 +352,14 @@ export default {
     this.getPaymentPasswordStatus();
     this.getZeroBanner();
     this.getMessageShuffling();
+  },
+  mounted() {
+    // let i = setInterval(() => {
+    //   if (document.getElementById("xiaoliang")) {
+    //     document.getElementById("xiaoliang").scrollIntoView(true);
+    //     clearInterval(i);
+    //   }
+    // }, 500)
   },
   methods: {
     /**

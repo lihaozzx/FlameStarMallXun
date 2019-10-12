@@ -1,52 +1,245 @@
 !<template>
-  <div class="free_buy">
+  <div
+    class="free_buy"
+    id="freeBuy"
+  >
     <TopNav
       name="全民FrreBuy"
       bc="#FF2644"
     ></TopNav>
-    <div class="head_imgbox">
-      <img src="../../assets/activity/box.png">
-      <img src="../../assets/activity/bottom.png">
-    </div>
-    <div class="content">
-      <img src="../../assets/activity/paper_exit.png">
-      <img src="../../assets/activity/paper_top.png">
-      <img src="../../assets/activity/paper_bot.png">
-      <div class="detail">
-        <p class="d_text">所支付金额均可全额返还，<br> 有权随时终止，<br> 信用卡支付也可返现金。</p>
+    <van-pull-refresh
+      v-model="isLoading"
+      @refresh="onRefresh"
+    >
+      <div class="head_imgbox">
+        <img src="../../assets/activity/box.png">
+        <img src="../../assets/activity/bottom.png">
       </div>
-    </div>
+      <div
+        class="content"
+        :style="{height:contentHeight+'rem'}"
+      >
+        <!-- 三张背景图 -->
+        <img src="../../assets/activity/paper_exit.png">
+        <img src="../../assets/activity/paper_top.png">
+        <div
+          class="back_rpt"
+          :style="{height:rptHeight+'rem'}"
+        ></div>
+        <img src="../../assets/activity/paper_bot.png">
+        <div class="detail">
+          <p class="d_text">所支付金额均可全额返还，<br> 有权随时终止，<br> 信用卡支付也可返现金。</p>
+          <div class="video_box">
+            <van-swipe
+              indicator-color="#FF2644"
+              @change="onChange"
+            >
+              <van-swipe-item
+                v-for="(src,i) in videoList"
+                :key="i"
+              >
+                <video
+                  :src="src"
+                  controls
+                ></video>
+                <!-- <img
+                  class="video_player_btn"
+                  src="../../assets/activity/video_play.png"
+                  @click="playPause(i)"
+                > -->
+              </van-swipe-item>
+              <div
+                class="van-swipe__indicators"
+                slot="indicator"
+              >
+                <i
+                  :class="i == sindex?'van-swipe__indicator van-swipe__indicator--active':'van-swipe__indicator'"
+                  v-for="(src,i) in videoList"
+                  :key="i"
+                  :style="i == sindex?'background-color: rgb(255, 38, 68);':''"
+                ></i>
+              </div>
+            </van-swipe>
+            <!-- <video
+              class="video_player"
+              src="../../assets/activity/VID_20191011_201736.mp4"
+              controls
+              preload="none"
+            ></video> -->
+          </div>
+          <p class="d_text_f">首次体验FreeBuy，送好礼
+            <van-icon
+              class="wenhao"
+              name="question-o"
+              @click="showRule=true"
+            />
+          </p>
+          <!-- 首单免费领的图 -->
+          <img
+            class="to_zero"
+            @click="toZeroShop"
+            src="../../assets/activity/capsule.png"
+          >
+          <p class="d_text_zero">全品类支持0元购买</p>
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <div class="goods_box">
+
+              <div
+                class="good_info"
+                v-for="i in goodsList"
+                :key="i.i"
+              >
+                aaa
+              </div>
+
+            </div>
+          </van-list>
+          <p
+            :class="nowScroll>1000?'see_more see_more_fixd':'see_more'"
+            @click="toHome"
+          >查看更多0元免费拿商品</p>
+        </div>
+      </div>
+    </van-pull-refresh>
+
+    <!-- 消息弹框 -->
+    <van-popup
+      v-model="showRule"
+      round
+      :style="{ height: '4.5rem',
+      width:'5.9rem',
+      fontSize:'.28rem',
+      padding:'.44rem' }"
+    >
+      <p class="pop_title">活动说明</p>
+      <p>首次体验freebuy，送好礼条件<br>
+        1、用freebuy的方式购买一个原价大于N元
+        的商品或用freebuy的方式消费N次即可免费
+        领取一份礼品。<br>
+        2、达成条件后每人仅限一次免费领取机会<br>
+        3、领取时间不限制<br>
+        4、活动最终解释权归寻草记商城所有</p>
+      <!-- <van-icon
+        name="clear"
+        class="pop_close"
+      /> -->
+    </van-popup>
   </div>
 </template>
 
 <script>
 import TopNav from "@/components/TopNavTwo";
+import homeApi from "@/api/home.js"
 export default {
-  props: {
-
-  },
   data() {
     return {
-
+      showRule: false,
+      isLoading: false,
+      loading: false,
+      finished: false,
+      nowScroll: 0,
+      goodsList: [],
+      videoList: [],
+      sindex: 1
     };
   },
   components: {
     TopNav
   },
   computed: {
-
+    /**
+     * 盒子的高度
+     */
+    contentHeight() {
+      return Math.ceil(this.goodsList.length / 2) * 5 + 15;
+    },
+    /**
+     * 撑开div的高度
+     */
+    rptHeight() {
+      return Math.ceil(this.goodsList.length / 2) * 5 - 10;
+    }
   },
   watch: {
 
   },
   created() {
-
+    this.getFreebuyVideo();
+    for (let i = 0; i < 25; i++) {
+      this.goodsList.push({ k: i })
+    }
   },
   mounted() {
-
+    //滑动距离
+    const elfb = document.getElementById("freeBuy");
+    elfb.addEventListener('scroll', (e) => {
+      this.nowScroll = elfb.scrollTop;
+    });
   },
   methods: {
+    /**
+     * 视频地址接口
+     */
+    getFreebuyVideo() {
+      homeApi.getFreebuyVideo().then(res => {
+        if (res.data.statusCode == 200 && res.data.messageCode == "MSG_1001") {
+          this.videoList = res.data.content.videoUrls
+        }
+      })
+    },
+    toZeroShop() {
+      if (window.wv) {
+        window.wv.freebuyToZeroshop();
+        return;
+      }
+      this.$router.push({ path: '/zeroShop', query: { type: 3 } });
+    },
+    toHome() {
+      if (window.wv) {
+        window.wv.gotoHomeTab();
+        return;
+      }
+      if (window.webkit) {
+        window.webkit.messageHandlers.goHome.postMessage();
+        return;
+      }
+      this.$router.push({ name: 'Home' });
+    },
+    /**
+     * 页面下拉刷新
+     */
+    onRefresh() {
 
+    },
+    /**
+     * 触底加载
+     */
+    onLoad() {
+      setTimeout(() => {
+        this.goodsList.push(...[{ k: 999 }, { k: 998 }, { k: 997 }]);
+        this.loading = false;
+      }, 3000);
+    },
+    onChange(key) {
+      this.sindex = key;
+    },
+    /**
+     * 跳转商品详情
+     */
+    gotoGoodDetail(item) {
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
+        window.webkit.messageHandlers.goDetail.postMessage(item.id);//id,type
+      }
+      if (window.wv) {
+        window.wv.goToDetail(item.id);
+      }
+      this.$router.push({ name: "GoodsDetail", params: { id: item.id } });
+    }
   },
 };
 </script>
@@ -54,6 +247,8 @@ export default {
 <style scoped lang="scss">
 .free_buy {
   background-color: #f9bdad;
+  height: 100vh;
+  overflow-y: scroll;
   .head_imgbox {
     height: 3.8rem;
     max-width: 7.5rem;
@@ -73,7 +268,6 @@ export default {
     }
   }
   .content {
-    background-color: #f9bdad;
     height: 24rem;
     padding: 0;
     max-width: 7.5rem;
@@ -84,14 +278,21 @@ export default {
       margin: 0 7.5%;
     }
     img:nth-of-type(2) {
+      width: 97%;
+      margin: 0 1.5%;
+      transform: translateY(-0.85rem);
+    }
+    .back_rpt {
       width: 96%;
       margin: 0 2%;
-      transform: translateY(-45%);
+      background-image: url("../../assets/activity/paper_bot_repete.png");
+      background-size: 100% auto;
+      transform: translateY(-1.3rem);
     }
     img:nth-of-type(3) {
       width: 96%;
       margin: 0 2%;
-      transform: translateY(-6.48%);
+      transform: translateY(-1.3rem);
     }
     .detail {
       position: absolute;
@@ -108,7 +309,119 @@ export default {
         line-height: 0.6rem;
         text-align: center;
       }
+      .video_box {
+        margin: 0.36rem auto 0;
+        width: 6.4rem;
+        height: 4rem;
+        border-radius: 0.08rem;
+        overflow: hidden;
+        .van-swipe {
+          width: 100%;
+          height: 100%;
+          .van-swipe-item {
+            position: relative;
+            .video_player_btn {
+              width: 1.2rem;
+              height: 1.2rem;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translateX(-100%) translateY(-50%);
+            }
+            video {
+              margin: 0;
+              width: 100%;
+            }
+          }
+          .van-swipe__indicators {
+            bottom: 0;
+            .van-swipe__indicator {
+              width: 0.16rem;
+              height: 0.16rem;
+              background-color: #a8a8a8;
+            }
+          }
+        }
+      }
+      .d_text_f {
+        width: 100%;
+        text-align: center;
+        color: #cb6380;
+        font-size: 0.28rem;
+        margin: 0.6rem 0 0.35rem;
+        .wenhao {
+          transform: translateY(18%);
+          font-size: 0.35rem;
+          font-weight: bold;
+        }
+      }
+      .to_zero {
+        width: 5.68rem;
+        margin: 0 calc((100% - 5.68rem) / 2);
+      }
+      .d_text_zero {
+        width: 3.4rem;
+        margin: 0 auto;
+        font-size: 0.28rem;
+        text-align: center;
+        background-image: url("../../assets/activity/decoration.png");
+        background-size: 100% auto;
+        background-repeat: no-repeat;
+        background-position-y: 40%;
+      }
+      .goods_box {
+        width: 100%;
+        margin-top: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        .good_info {
+          width: 3rem;
+          height: 4.6rem;
+          margin-bottom: 0.4rem;
+          background-color: #cb6380;
+        }
+      }
+      .see_more {
+        margin-top: 0.1rem;
+        text-align: center;
+        font-size: 0.32rem;
+        color: #ff2644;
+        font-family: PingFang SC;
+        white-space: nowrap;
+        padding: 0.1rem;
+      }
+      .see_more_fixd {
+        position: fixed;
+        bottom: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba($color: #ffffff, $alpha: 0.4);
+        border-radius: 0.1rem;
+      }
+      .see_more::after {
+        content: "";
+        background-image: url("../../assets/activity/ic_more.png");
+        background-size: 100%;
+        background-position-y: 50%;
+        background-repeat: no-repeat;
+        padding: 0.2rem;
+        margin-left: 0.2rem;
+      }
     }
   }
+  .pop_title {
+    font-size: 0.34rem;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+  }
+  // .pop_close {
+  //   color: rgb(136, 148, 168);
+  //   font-size: 0.8rem;
+  //   position: absolute;
+  //   top: 0.2rem;
+  //   right: 0.2rem;
+  // }
 }
 </style>

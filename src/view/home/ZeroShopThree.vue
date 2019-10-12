@@ -263,7 +263,7 @@ export default {
       seconds: [],
       haoSeconds: [],
       showGoods: 2,
-      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ''],
+      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ' '],
       zeroActivityText: ['', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束'],
     };
   },
@@ -331,6 +331,8 @@ export default {
   },
   methods: {
     goZeroDetail(item) {
+      //判断是否freebuy TODO
+
       if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
         window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
       }
@@ -719,6 +721,12 @@ export default {
     .s3 {
       padding: 0.14rem 0.5rem 0 0.17rem;
     }
+    .s3.way_chosed {
+      color: #a53e61 !important;
+    }
+    .s3.way_chosed::after {
+      border-color: #a53e61 !important;
+    }
   }
 
   .share {
@@ -1002,6 +1010,7 @@ export default {
         font-weight: bold;
         color: rgba(240, 142, 150, 1);
         line-height: 0.4rem;
+        white-space: pre-wrap;
       }
       .zero_good_list {
         width: 86%;

@@ -508,7 +508,7 @@ export default {
           priceArr.push(element.dctPrice);
         }
       }
-      priceArr.sort((a, b) => a - b);
+      priceArr.sort((a, b) => b - a);
       return priceArr[0];
     }
   },
