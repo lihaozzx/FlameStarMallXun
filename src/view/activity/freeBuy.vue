@@ -38,15 +38,16 @@
                 v-for="(src,i) in videoList"
                 :key="i"
               >
-                <video
+                <!-- <video
                   :src="src"
                   controls
-                ></video>
-                <!-- <img
+                ></video> -->
+                <img :src="src.iconUrl">
+                <img
                   class="video_player_btn"
                   src="../../assets/activity/video_play.png"
                   @click="playPause(i)"
-                > -->
+                >
               </van-swipe-item>
               <div
                 class="van-swipe__indicators"
@@ -188,7 +189,7 @@ export default {
     getFreebuyVideo() {
       homeApi.getFreebuyVideo().then(res => {
         if (res.data.statusCode == 200 && res.data.messageCode == "MSG_1001") {
-          this.videoList = res.data.content.videoUrls
+          this.videoList = res.data.content.videos;
         }
       })
     },
@@ -326,11 +327,12 @@ export default {
               position: absolute;
               top: 50%;
               left: 50%;
-              transform: translateX(-100%) translateY(-50%);
+              transform: translateX(-50%) translateY(-50%);
             }
-            video {
+            img {
               margin: 0;
               width: 100%;
+              height: calc(100% - 0.2rem);
             }
           }
           .van-swipe__indicators {
