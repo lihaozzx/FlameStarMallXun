@@ -153,7 +153,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-Vue.filter("dateFormat1", function(t) {
+Vue.filter("dateFormat1", function (t) {
   if (!t) {
     return "";
   }
@@ -177,7 +177,7 @@ Vue.filter("dateFormat1", function(t) {
     .padStart(2, "0");
   return `${y}-${m}-${d} ${hh}:${mm}`;
 });
-window.onload = function() {
+window.onload = function () {
   if (isWeiXin()) {
     localStorage.setItem("isWeiXin", true);
     // const data = {
@@ -222,6 +222,15 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+axios.interceptors.response.use(response => {
+  if (response.status == 200) {
+    // return response.data;
+  }
+  return response;
+}, err => {
+  return Promise.reject(err);
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: "#app",

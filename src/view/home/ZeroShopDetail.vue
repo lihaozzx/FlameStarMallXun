@@ -522,11 +522,13 @@ export default {
         targetId: this.$route.params.id
       };
       wxApi.weChatSnapshot(data).then(res => {
-        this.info = res.data.content;
-        this.convertImgToBase64(this.info.appletQrCodeUrl)
-          .then(url => {
-            this.info.appletQrCodeUrl = url;
-          })
+        if (res.data.messageCode == 'MSG_1001') {
+          this.info = res.data.content;
+          this.convertImgToBase64(this.info.appletQrCodeUrl)
+            .then(url => {
+              this.info.appletQrCodeUrl = url;
+            })
+        }
       });
     },
     snapshot() {
@@ -696,6 +698,7 @@ export default {
         let isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1;
         let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
         if (this.noneLogin) {
+          //未登录跳转
           sessionStorage.setItem(
             "referrer",
             window.location.href.split("/#/")[1]

@@ -224,12 +224,30 @@
         alt
       />
     </van-dialog>
+    <!-- 消息弹框 -->
+    <van-popup
+      v-model="showRule"
+      round
+      :style="{ height: '4.5rem',
+      width:'5.9rem',
+      fontSize:'.28rem',
+      padding:'.44rem' }"
+    >
+      <p class="pop_title">提示</p>
+      <p>首次体验freebuy，送好礼条件<br>
+        1、用freebuy的方式购买一个原价大于N元
+        的商品或用freebuy的方式消费N次即可免费
+        领取一份礼品。<br>
+        2、达成条件后每人仅限一次免费领取机会<br>
+        3、领取时间不限制<br>
+        4、活动最终解释权归寻草记商城所有</p>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import TopNav from "@/components/TopNavTwo";
-import homeApi from "@/api/home";
+import homeApi from "../../api/home";
 import wxApi from "@/api/wx"
 import * as types from "@/store/mutation-types";
 import { log } from "util";
@@ -265,6 +283,7 @@ export default {
       showGoods: 2,
       zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ' '],
       zeroActivityText: ['', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束'],
+      showRule: false,
     };
   },
   created() {
@@ -291,10 +310,10 @@ export default {
       this.goHomeShow = false;
     }
     if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.initDataZero) {
-      window.webkit.messageHandlers.initDataZero.postMessage(0, 2);
+      window.webkit.messageHandlers.initDataZero.postMessage(0, this.showGoods);
     }
     if (window.wv) {
-      window.wv.initDataZero(0, 2);
+      window.wv.initDataZero(0, this.showGoods);
     }
   },
   computed: {
@@ -332,7 +351,10 @@ export default {
   methods: {
     goZeroDetail(item) {
       //判断是否freebuy TODO
+      if (this.showGoods == 3) {
+        // 是否有权限
 
+      }
       if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
         window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
       }
@@ -351,9 +373,10 @@ export default {
       };
       homeApi.getFreeShopping(data).then(res => {
         if (res.data.content) {
-          this.zeroInfo = res.data.content;
-          this.countDown = this.zeroInfo.remainingTime;
-          this.formatDuring(this.countDown);
+          this.zeroInfo = res.data.content;//list赋值
+          this.countDown = this.zeroInfo.remainingTime;//倒计时
+          this.formatDuring(this.countDown);//格式化倒计时
+          //开始倒计时
           let interval = setInterval(() => {
             if (this.countDown > 0) {
               this.countDown -= 1000;
@@ -433,6 +456,23 @@ export default {
       })
     },
     /**
+     * 信用卡分享图
+     */
+    getWeChatSnapshot2() {
+      const data = {
+        mode: 6
+      }
+      wxApi.weChatSnapshot(data).then(res => {
+        if (res.data.content) {
+          this.infoc = res.data.content;
+          this.convertImgToBase64(this.infoc.appletQrCodeUrl)
+            .then(url => {
+              this.infoc.appletQrCodeUrl = url;
+            })
+        }
+      })
+    },
+    /**
      * 解决canvas图片跨域
      */
     convertImgToBase64(url) {
@@ -453,29 +493,15 @@ export default {
       })
     },
     /**
-     * 信用卡分享图
+     * 格式化时间
+     * 格式化时分秒毫秒后存入数组？
+     * 然后页面也没用上？
      */
-    getWeChatSnapshot2() {
-      const data = {
-        mode: 6
-      }
-      wxApi.weChatSnapshot(data).then(res => {
-        if (res.data.content) {
-          this.infoc = res.data.content;
-          this.convertImgToBase64(this.infoc.appletQrCodeUrl)
-            .then(url => {
-              this.infoc.appletQrCodeUrl = url;
-            })
-        }
-      })
-    },
     formatDuring(mss) {
       const hours = parseInt(mss / (1000 * 60 * 60)).toString();
       this.hours = hours.split("");
       // this.minutes = parseInt((mss % (1000 * 60 * 60)) / (1000 * 60))
-      const minutes = parseInt(
-        (mss % (1000 * 60 * 60)) / (1000 * 60)
-      ).toString();
+      const minutes = parseInt((mss % (1000 * 60 * 60)) / (1000 * 60)).toString();
       this.minutes = minutes.split("");
       const seconds = parseInt((mss % (1000 * 60)) / 1000).toString();
       this.seconds = seconds.split("");

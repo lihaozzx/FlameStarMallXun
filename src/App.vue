@@ -28,13 +28,10 @@ export default {
 </script>
 
 <style>
-/* #app {
-  background: #F4F4F4;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.pop_title {
+  font-size: 0.34rem;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-} */
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
 </style>

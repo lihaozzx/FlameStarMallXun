@@ -92,5 +92,16 @@ export default {
    */
   getFreebuyVideo(data) {
     return axios.get(`${params.base_url}/home/activity/freeBuy`, { params: data });
-  }
+  },
+  /**
+   * freebuy活动页商品详情
+   * @param {Object} data
+   * {
+   *   pageNumber:页码,
+   *   pageSize:分页数量
+   * }
+   */
+  getFreebuyGoods(data) {
+    return axios.get(`${params.base_url}/home/activity/freeBuy/goods`, { params: data });
+  },
 };

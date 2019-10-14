@@ -21,12 +21,15 @@
       >
         <!-- 三张背景图 -->
         <img src="../../assets/activity/paper_exit.png">
-        <img src="../../assets/activity/paper_top.png">
-        <div
-          class="back_rpt"
-          :style="{height:rptHeight+'rem'}"
-        ></div>
-        <img src="../../assets/activity/paper_bot.png">
+        <div class="back_box">
+          <img src="../../assets/activity/paper_top.png">
+          <div
+            class="back_rpt"
+            :style="{height:rptHeight+'rem'}"
+          ></div>
+          <img src="../../assets/activity/paper_bot.png">
+        </div>
+
         <div class="detail">
           <p class="d_text">所支付金额均可全额返还，<br> 有权随时终止，<br> 信用卡支付也可返现金。</p>
           <div class="video_box">
@@ -37,36 +40,50 @@
               <van-swipe-item
                 v-for="(src,i) in videoList"
                 :key="i"
+                @click="playVideo(i)"
               >
-                <!-- <video
-                  :src="src"
-                  controls
-                ></video> -->
-                <img :src="src.iconUrl">
                 <img
+                  :src="src.iconUrl"
+                  v-if="!(showVideo == i)"
+                >
+                <img
+                  v-if="!(showVideo == i)"
                   class="video_player_btn"
                   src="../../assets/activity/video_play.png"
-                  @click="playPause(i)"
                 >
+                <video
+                  v-if="isAndroid&&showVideo == i"
+                  :id="'video'+i"
+                  :src="src.videoUrl"
+                  controls
+                  x5-video-player-fullscreen="true"
+                  x5-playsinline
+                  playsinline
+                  webkit-playsinline
+                  preload="none"
+                ></video>
+                <video
+                  v-if="!isAndroid&&showVideo == i"
+                  :id="'video'+i"
+                  :src="src.videoUrl"
+                  controls
+                  preload="none"
+                ></video>
+
               </van-swipe-item>
+              <!-- 自定义指示器 -->
               <div
                 class="van-swipe__indicators"
                 slot="indicator"
               >
                 <i
                   :class="i == sindex?'van-swipe__indicator van-swipe__indicator--active':'van-swipe__indicator'"
-                  v-for="(src,i) in videoList"
+                  v-for="(v,i) in videoList"
                   :key="i"
                   :style="i == sindex?'background-color: rgb(255, 38, 68);':''"
                 ></i>
               </div>
             </van-swipe>
-            <!-- <video
-              class="video_player"
-              src="../../assets/activity/VID_20191011_201736.mp4"
-              controls
-              preload="none"
-            ></video> -->
           </div>
           <p class="d_text_f">首次体验FreeBuy，送好礼
             <van-icon
@@ -93,9 +110,18 @@
               <div
                 class="good_info"
                 v-for="i in goodsList"
-                :key="i.i"
+                :key="i.id"
               >
-                aaa
+                <div
+                  class="good_img"
+                  :style="'background-image:url('+i.imageUrls[0]+')'"
+                ></div>
+                <p class="good_title">{{i.name}}</p>
+                <van-button
+                  class="good_btn"
+                  round
+                  @click="toGoodDetail(i.id)"
+                >0元免费拿</van-button>
               </div>
 
             </div>
@@ -125,10 +151,6 @@
         2、达成条件后每人仅限一次免费领取机会<br>
         3、领取时间不限制<br>
         4、活动最终解释权归寻草记商城所有</p>
-      <!-- <van-icon
-        name="clear"
-        class="pop_close"
-      /> -->
     </van-popup>
   </div>
 </template>
@@ -136,17 +158,23 @@
 <script>
 import TopNav from "@/components/TopNavTwo";
 import homeApi from "@/api/home.js"
+import { setInterval } from 'timers';
 export default {
   data() {
     return {
-      showRule: false,
-      isLoading: false,
-      loading: false,
-      finished: false,
-      nowScroll: 0,
-      goodsList: [],
-      videoList: [],
-      sindex: 1
+      showRule: false,//规则是否展示
+      isLoading: false,//页面是否处于下拉加载
+      loading: false,//商品列表是否处于加载
+      finished: false,//商品列表是否加载完成
+      isAndroid: false,//是安卓吗？
+      nowScroll: 0,//滚动距离，判断浮动
+      showVideo: -1,//播放视频下标
+      page: 1,//商品接口页数
+      pageSize: 20,//商品接口单次加载数据
+      goodsList: [],//商品列表
+      videoList: [],//视频列表
+      sindex: 0,//轮播图指示器
+      videoSchedule: {}//视频进度储存
     };
   },
   components: {
@@ -171,8 +199,9 @@ export default {
   },
   created() {
     this.getFreebuyVideo();
-    for (let i = 0; i < 25; i++) {
-      this.goodsList.push({ k: i })
+    let u = navigator.userAgent;
+    if (u.indexOf("Android") > -1 || u.indexOf("Adr") > -1) {
+      this.isAndroid = true;
     }
   },
   mounted() {
@@ -193,6 +222,31 @@ export default {
         }
       })
     },
+    /**
+     * 商品接口
+     */
+    getFreebuygoods() {
+      const params = {
+        pageNumber: this.page,
+        pageSize: this.pageSize
+      };
+      return new Promise((resolve, reject) => {
+        homeApi.getFreebuyGoods(params)
+          .then(res => {
+            if (res.data.statusCode == 200 && res.data.messageCode == "MSG_1001") {
+              this.goodsList.push(...res.data.content);
+              this.page++;
+              if (res.data.content.length < 20) {
+                this.finished = true;
+              }
+              resolve();
+            }
+          })
+          .catch(err => {
+            resolve();
+          });
+      });
+    },
     toZeroShop() {
       if (window.wv) {
         window.wv.freebuyToZeroshop();
@@ -211,22 +265,61 @@ export default {
       }
       this.$router.push({ name: 'Home' });
     },
+    toGoodDetail(id) {
+      if (window.wv) {
+        window.wv.gotoGoodsDetail(id);
+        return;
+      }
+
+      this.$router.push({ name: "GoodsDetail", params: { id: id } });
+    },
+    /**
+     * 播放视频
+     */
+    playVideo(i) {
+      this.showVideo = i;
+      setTimeout(_ => {
+        let el = document.getElementById("video" + i);
+        el.play();
+        //如果有播放记录就跳转记录点
+        if (this.videoSchedule[this.showVideo]) {
+          el.currentTime = this.videoSchedule[this.showVideo];
+        }
+      }, 0);//等待dom加载完成
+
+    },
     /**
      * 页面下拉刷新
      */
     onRefresh() {
-
+      //初始化商品相关数据
+      this.page = 1;
+      this.goodsList = [];
+      this.finished = false;
+      this.getFreebuygoods()
+        .then(_ => {
+          this.isLoading = false;
+        });
     },
     /**
      * 触底加载
      */
     onLoad() {
-      setTimeout(() => {
-        this.goodsList.push(...[{ k: 999 }, { k: 998 }, { k: 997 }]);
-        this.loading = false;
-      }, 3000);
+      this.getFreebuygoods()
+        .then(_ => {
+          this.loading = false;
+        })
     },
+    /**
+     * 轮播图滚动
+     */
     onChange(key) {
+      //记录播放时间
+      let el = document.getElementById("video" + this.showVideo);
+      if (el) {
+        this.videoSchedule[this.showVideo] = el.currentTime;
+      }
+      this.showVideo = -1;//不暂停直接删除video的dom元素
       this.sindex = key;
     },
     /**
@@ -278,23 +371,27 @@ export default {
       width: 85%;
       margin: 0 7.5%;
     }
-    img:nth-of-type(2) {
-      width: 97%;
-      margin: 0 1.5%;
-      transform: translateY(-0.85rem);
+    .back_box {
+      width: 100%;
+      transform: translateY(-0.9rem);
+      img:nth-of-type(1) {
+        width: 97%;
+        margin: 0 1.5%;
+        display: block;
+        transform: translateY(0.05rem);
+      }
+      .back_rpt {
+        width: 96%;
+        margin: 0 2%;
+        background-image: url("../../assets/activity/paper_bot_repete.png");
+        background-size: 100% auto;
+      }
+      img:nth-of-type(2) {
+        width: 96%;
+        margin: 0 2%;
+      }
     }
-    .back_rpt {
-      width: 96%;
-      margin: 0 2%;
-      background-image: url("../../assets/activity/paper_bot_repete.png");
-      background-size: 100% auto;
-      transform: translateY(-1.3rem);
-    }
-    img:nth-of-type(3) {
-      width: 96%;
-      margin: 0 2%;
-      transform: translateY(-1.3rem);
-    }
+
     .detail {
       position: absolute;
       width: 100%;
@@ -330,6 +427,11 @@ export default {
               transform: translateX(-50%) translateY(-50%);
             }
             img {
+              margin: 0;
+              width: 100%;
+              height: calc(100% - 0.2rem);
+            }
+            video {
               margin: 0;
               width: 100%;
               height: calc(100% - 0.2rem);
@@ -381,7 +483,36 @@ export default {
           width: 3rem;
           height: 4.6rem;
           margin-bottom: 0.4rem;
-          background-color: #cb6380;
+          position: relative;
+          .good_img {
+            width: 100%;
+            height: 3rem;
+            border-radius: 0.04rem;
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+          }
+          .good_title {
+            width: 100%;
+            margin-top: 0.24rem;
+            font-size: 0.28rem;
+            color: #333333;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+          .good_btn {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0.64rem;
+            color: #ffffff;
+            background-color: #ff2644;
+            font-size: 0.3rem;
+            border-radius: 0.32rem;
+            border: none;
+            line-height: 0.64rem;
+          }
         }
       }
       .see_more {
@@ -412,18 +543,5 @@ export default {
       }
     }
   }
-  .pop_title {
-    font-size: 0.34rem;
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 0.4rem;
-  }
-  // .pop_close {
-  //   color: rgb(136, 148, 168);
-  //   font-size: 0.8rem;
-  //   position: absolute;
-  //   top: 0.2rem;
-  //   right: 0.2rem;
-  // }
 }
 </style>
