@@ -84,6 +84,7 @@
             slot="indicator"
           >{{ current + 1 }}/{{goodsImgList.length}}</div>
         </van-swipe>
+        <!-- 轮播图结束 -->
         <div class="shop-detail">
           <div class="price-container">
             <div class="left">
@@ -322,6 +323,17 @@
               </div>
             </div>
           </van-list>
+        </div>
+        <!-- freebuy按钮 -->
+        <div
+          class="free_buy_btn"
+          :style="animateDx"
+          @click="toDownload"
+        >
+          <img
+            src="../../assets/home/four.png"
+            alt=""
+          >
         </div>
       </div>
       <van-goods-action>
@@ -584,10 +596,32 @@ export default {
       cartNum: null, // 购物车数量
       cashbackItems: [], // 分期返的选项
       cashBackId: "", // 分期返现id
-      backSelectIndex: "" // 分期返现选中的index
+      backSelectIndex: "",// 分期返现选中的index
+      scNum: 1,
     };
   },
   created() {
+    // 按钮动画
+    (function (t) {
+      let itv = null;
+      function add() {
+        return setInterval(() => {
+          t.scNum += 0.01;
+          if (t.scNum > 1.2) {
+            clearInterval(itv);
+            itv = setInterval(() => {
+              t.scNum -= 0.01;
+              if (t.scNum < 1) {
+                clearInterval(itv);
+                itv = add();
+              }
+            }, 30)
+          }
+        }, 30)
+      }
+      itv = add();
+    })(this);
+
     if (window.location.href.split("inviterCode=")[1]) {
       this.goHomeShow = true;
       this.$store.commit(
@@ -995,9 +1029,23 @@ export default {
         this.shareShow = true;
         // this.$router.replace({name: 'ShareGoods'})
       }
+    },
+    toDownload() {
+      window.open("https://a.app.qq.com/o/simple.jsp?pkgname=com.jiutian.yzsotreapp");
     }
   },
   computed: {
+    /**
+     * 动画的style
+     */
+    animateDx() {
+      return {
+        transform: 'scale(' + this.scNum + ',' + this.scNum + ')'
+      }
+    },
+    /**
+     * 返现文本
+     */
     getText() {
       if (this.goodsDetail.sharingProfit) {
         return "分享返" + this.goodsDetail.sharingProfit;
@@ -1243,13 +1291,14 @@ export default {
   width: 100%;
   background: #f4f4f4;
   margin-bottom: 1rem;
+  position: relative;
   .swipe-img {
     width: 100%;
     height: 7.5rem;
   }
   .swipe-number {
     position: absolute;
-    right: 0.2rem;
+    left: 0.2rem;
     top: 6.8rem;
     width: 0.64rem;
     height: 0.64rem;
@@ -1580,6 +1629,18 @@ export default {
       font-weight: bold;
       color: rgba(51, 51, 51, 1);
       font-size: 0.34rem;
+    }
+  }
+  // freebuy按钮
+  .free_buy_btn {
+    position: absolute;
+    width: 1.8rem;
+    height: 0.88rem;
+    top: 7rem;
+    right: 0.3rem;
+    img {
+      width: 100%;
+      height: 100%;
     }
   }
   .quality-container {

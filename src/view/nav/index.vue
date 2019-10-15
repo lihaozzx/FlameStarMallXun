@@ -1,63 +1,64 @@
 <template>
-<div>
-  <van-tabbar
-    fixed
-    v-model="active"
-    active-color="#FF2644"
-  >
-    <van-tabbar-item
-      replace
-      to="/home"
+  <div>
+    <van-tabbar
+      fixed
+      v-model="active"
+      active-color="#FF2644"
     >
-      <span>首页</span>
-      <img
-        slot="icon"
-        slot-scope="props"
-        :src="props.active ? iconList[0].active : iconList[0].normal"
+      <van-tabbar-item
+        replace
+        to="/home"
       >
-    </van-tabbar-item>
-    <van-tabbar-item
-      replace
-      to="/member"
-    >
-      <span>会员</span>
-      <img
-        slot="icon"
-        slot-scope="props"
-        :src="props.active ? iconList[1].active : iconList[1].normal"
+        <span>首页</span>
+        <img
+          slot="icon"
+          slot-scope="props"
+          :src="props.active ? iconList[0].active : iconList[0].normal"
+        >
+      </van-tabbar-item>
+      <van-tabbar-item
+        replace
+        to="/member"
       >
-    </van-tabbar-item>
-    <van-tabbar-item
-      replace
-      to="/cart"
-    >
-      <span>购物车</span>
-      <img
-        slot="icon"
-        slot-scope="props"
-        :src="props.active ? iconList[2].active : iconList[2].normal"
+        <span>会员</span>
+        <img
+          slot="icon"
+          slot-scope="props"
+          :src="props.active ? iconList[1].active : iconList[1].normal"
+        >
+      </van-tabbar-item>
+      <van-tabbar-item
+        replace
+        to="/cart"
       >
-    </van-tabbar-item>
-    <van-tabbar-item
-      replace
-      to="/mine"
-    >
-      <span>我的</span>
-      <img
-        slot="icon"
-        slot-scope="props"
-        :src="props.active ? iconList[3].active : iconList[3].normal"
+        <span>购物车</span>
+        <img
+          slot="icon"
+          slot-scope="props"
+          :src="props.active ? iconList[2].active : iconList[2].normal"
+        >
+      </van-tabbar-item>
+      <van-tabbar-item
+        replace
+        to="/mine"
       >
-    </van-tabbar-item>
-  </van-tabbar>
-  <router-view/>
-</div>
+        <span>我的</span>
+        <img
+          slot="icon"
+          slot-scope="props"
+          :src="props.active ? iconList[3].active : iconList[3].normal"
+        >
+      </van-tabbar-item>
+
+    </van-tabbar>
+    <router-view />
+  </div>
 </template>
 
 <script>
 export default {
   name: 'index',
-  data () {
+  data() {
     return {
       active: 0,
       iconList: [
@@ -80,7 +81,7 @@ export default {
       ]
     }
   },
-  created () {
+  created() {
     if (this.$route.path === '/mine') {
       this.active = 3
     } else if (this.$route.path === '/cart') {
@@ -92,7 +93,7 @@ export default {
     }
   },
   watch: {
-    $route (val) {
+    $route(val) {
       console.log(val.name)
       if (val.name === 'Mine') {
         this.active = 3
@@ -109,7 +110,7 @@ export default {
 </script>
 
 <style scoped>
-img{
+img {
   width: 0.54rem;
   height: 0.54rem !important;
 }

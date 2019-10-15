@@ -199,7 +199,7 @@ import TopNav from '@/components/TopNav'
 import homeApi from '@/api/home'
 import mineApi from '@/api/mine'
 import QualityCertification from '@/components/QualityCertification'
-import orderApi from '@/api/order'
+import orderApi from '../../api/order'
 import wxApi from '@/api/wx'
 export default {
   name: 'Order',
@@ -336,7 +336,8 @@ export default {
       //   return
       // }
       if (this.orderWaring) return;
-      if (this.goodsInfo.orderType == 3 || this.goodsInfo.orderType == 4) {
+      //根据orderType 不同 走不同的接口
+      if (this.goodsInfo.orderType == 3 || this.goodsInfo.orderType == 4 || this.goodsInfo.orderType == 6) {
         this.freeShoppingPlaceOrder();
         return;
       }
@@ -350,12 +351,12 @@ export default {
         }
         orderApi.postAddOrderByGoods(data).then(res => {
           if (res.data.messageCode === 'MSG_1001') {
-            const data2 = res.data.content
-            // data2.cashBack = this.cashBack
-            data2.token = document.cookie.split('token=')[1]
-            this.$router.replace({ name: 'Pay', params: { orderInfo: encodeURIComponent(JSON.stringify(data2)) } })
+            const data2 = res.data.content;
+            // data2.cashBack = this.cashBack;
+            data2.token = document.cookie.split('token=')[1];
+            this.$router.replace({ name: 'Pay', params: { orderInfo: encodeURIComponent(JSON.stringify(data2)) } });
           } else {
-            this.$toast(res.data.message)
+            this.$toast(res.data.message);
           }
         })
       } else if (this.goodsInfo.cardIds) {

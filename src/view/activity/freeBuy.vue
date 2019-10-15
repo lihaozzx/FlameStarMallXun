@@ -252,7 +252,7 @@ export default {
         window.wv.freebuyToZeroshop();
         return;
       }
-      this.$router.push({ path: '/zeroShop', query: { type: 3 } });
+      this.$router.push({ path: '/zeroShop', query: { type: 4 } });
     },
     toHome() {
       if (window.wv) {

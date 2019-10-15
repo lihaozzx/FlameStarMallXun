@@ -115,8 +115,8 @@
         </div>
         <div
           class="way_bas s3"
-          :class="showGoods == 3?'way_chosed':'way'"
-          @click="changeShowGoods(3)"
+          :class="showGoods == 4?'way_chosed':'way'"
+          @click="changeShowGoods(4)"
         >
           <span>FreeBuy首单免费领</span>
         </div>
@@ -281,7 +281,7 @@ export default {
       seconds: [],
       haoSeconds: [],
       showGoods: 2,
-      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ' '],
+      zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ' ', ' '],
       zeroActivityText: ['', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束'],
       showRule: false,
     };
@@ -350,11 +350,6 @@ export default {
   },
   methods: {
     goZeroDetail(item) {
-      //判断是否freebuy TODO
-      if (this.showGoods == 3) {
-        // 是否有权限
-
-      }
       if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
         window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
       }
@@ -418,7 +413,7 @@ export default {
     getFreeShopping3() {
       const data = {
         mode: 2,
-        type: 3
+        type: 4
       };
       homeApi.getFreeShopping(data).then(res => {
         if (res.data.content) {

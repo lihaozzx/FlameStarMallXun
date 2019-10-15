@@ -956,7 +956,7 @@ export default {
                   goodsId: this.goodsDetail.id,//商品id
                   stockId: skuData.selectedSkuComb.id,//规格id
                   type: this.$route.query.type,//商品方式1零元购 2信用卡 3freebuy
-                  orderType: this.$route.query.type == 1 ? 3 : this.$route.query.type == 2 ? 4 : 0,//3零元购 4信用卡
+                  orderType: this.$route.query.type == 1 ? 3 : this.$route.query.type == 2 ? 4 : this.$route.query.type == 4 ? 6 : 0,//3零元购 4信用卡 6freebuy
                   quantity: 1//购买数量
                 };
                 this.$router.push({
