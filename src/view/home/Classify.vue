@@ -1,5 +1,18 @@
 <template>
   <div>
+    <transition name="fade">
+      <!-- 某某某购买了xxx -->
+      <div
+        v-if="visibel"
+        class="swipe-text"
+      >
+        <img
+          src="../../assets/home/tzhi_icon.png"
+          alt
+        />
+        <div class="font">{{messageShuffling}}</div>
+      </div>
+    </transition>
     <van-tabs
       title-active-color="#FF6417"
       color="#FF8D12"
@@ -13,19 +26,6 @@
         :key="item.id"
         :title="item.name"
       >
-        <transition name="fade">
-          <!-- 某某某购买了xxx -->
-          <div
-            v-if="visibel"
-            class="swipe-text"
-          >
-            <img
-              src="../../assets/home/tzhi_icon.png"
-              alt
-            />
-            <div class="font">{{messageShuffling}}</div>
-          </div>
-        </transition>
         <!--        <van-swipe
           :duration="2000"
           v-if="messageShufflingList.length > 0"
@@ -378,9 +378,10 @@ export default {
         this.visibel = !this.visibel;
         if (this.visibel) {
           i++;
+          if (i == this.messageShufflingList.length) { i = 0; }
           this.messageShuffling = this.messageShufflingList[i];
         }
-      }, 3000);
+      }, 2000);
     },
     /**
      * 零元购入口
@@ -605,7 +606,8 @@ export default {
 .fade-leave-active {
   transition: opacity 1s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 .swipe {
@@ -621,7 +623,7 @@ export default {
 .swipe-text {
   z-index: 99;
   position: fixed;
-  top: 2rem;
+  top: 3rem;
   margin-top: 0.24rem;
   margin-left: 0.16rem;
   line-height: 1rem;
