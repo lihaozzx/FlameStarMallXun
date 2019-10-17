@@ -104,4 +104,15 @@ export default {
   getFreebuyGoods(data) {
     return axios.get(`${params.base_url}/home/activity/freeBuy/goods`, { params: data });
   },
+  /**
+   * 检测freebuy是否拥有购买权限
+   * @param {Object} data 
+   * {
+   * type:传4
+   * goodsId:商品ID
+   * }
+   */
+  validateRole(data) {
+    return axios.post(`${params.base_url}/home/activity/freeShopping/obtaining/validate`, data);
+  },
 };

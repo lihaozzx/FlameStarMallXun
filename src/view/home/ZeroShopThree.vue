@@ -349,7 +349,22 @@ export default {
     }
   },
   methods: {
+    /**
+     * 跳转详情
+     */
     goZeroDetail(item) {
+      if (this.showGoods == 4) {
+        const data = {
+          type: 4,
+          goodsId: item.id
+        }
+        homeApi.validateRole(data).then(res => {
+          if (res.status == 200 && res.data.messageCode != 'MSG_1001') {
+            this.$dialog.alert({ title: '提示', message: res.data.message });
+            return;
+          }
+        })
+      }
       if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
         window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
       }

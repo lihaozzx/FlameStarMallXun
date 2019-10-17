@@ -42,16 +42,13 @@
                 :key="i"
                 @click="playVideo(i)"
               >
+                <img :src="src.iconUrl">
+                <!-- v-if="!(showVideo == i)" -->
                 <img
-                  :src="src.iconUrl"
-                  v-if="!(showVideo == i)"
-                >
-                <img
-                  v-if="!(showVideo == i)"
                   class="video_player_btn"
                   src="../../assets/activity/video_play.png"
                 >
-                <video
+                <!-- <video
                   v-if="isAndroid&&showVideo == i"
                   :id="'video'+i"
                   :src="src.videoUrl"
@@ -68,7 +65,7 @@
                   :src="src.videoUrl"
                   controls
                   preload="none"
-                ></video>
+                ></video> -->
 
               </van-swipe-item>
               <!-- 自定义指示器 -->
@@ -86,11 +83,11 @@
             </van-swipe>
           </div>
           <p class="d_text_f">首次体验FreeBuy，送好礼
-            <van-icon
+            <!-- <van-icon
               class="wenhao"
               name="question-o"
               @click="showRule=true"
-            />
+            /> -->
           </p>
           <!-- 首单免费领的图 -->
           <img
@@ -117,6 +114,7 @@
                   :style="'background-image:url('+i.imageUrls[0]+')'"
                 ></div>
                 <p class="good_title">{{i.name}}</p>
+                <p class="good_prise">购买原价：￥{{i.dctPrice}}</p>
                 <van-button
                   class="good_btn"
                   round
@@ -168,13 +166,13 @@ export default {
       finished: false,//商品列表是否加载完成
       isAndroid: false,//是安卓吗？
       nowScroll: 0,//滚动距离，判断浮动
-      showVideo: -1,//播放视频下标
+      // showVideo: -1,//播放视频下标
       page: 1,//商品接口页数
       pageSize: 20,//商品接口单次加载数据
       goodsList: [],//商品列表
       videoList: [],//视频列表
       sindex: 0,//轮播图指示器
-      videoSchedule: {}//视频进度储存
+      videoSchedule: {},//视频进度储存
     };
   },
   components: {
@@ -185,13 +183,13 @@ export default {
      * 盒子的高度
      */
     contentHeight() {
-      return Math.ceil(this.goodsList.length / 2) * 5 + 15;
+      return Math.ceil(this.goodsList.length / 2) * 5.1 + 15;
     },
     /**
      * 撑开div的高度
      */
     rptHeight() {
-      return Math.ceil(this.goodsList.length / 2) * 5 - 10;
+      return Math.ceil(this.goodsList.length / 2) * 5.1 - 10;
     }
   },
   watch: {
@@ -257,12 +255,11 @@ export default {
     toHome() {
       if (window.wv) {
         window.wv.gotoHomeTab();
-        return;
       }
-      if (window.webkit) {
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goHome) {
         window.webkit.messageHandlers.goHome.postMessage();
-        return;
       }
+      this.$toast("qweqweqweqweqweqweqweqeqeqweqwe");
       this.$router.push({ name: 'Home' });
     },
     toGoodDetail(id) {
@@ -277,15 +274,22 @@ export default {
      * 播放视频
      */
     playVideo(i) {
-      this.showVideo = i;
-      setTimeout(_ => {
-        let el = document.getElementById("video" + i);
-        el.play();
-        //如果有播放记录就跳转记录点
-        if (this.videoSchedule[this.showVideo]) {
-          el.currentTime = this.videoSchedule[this.showVideo];
-        }
-      }, 0);//等待dom加载完成
+      if (window.wv) {
+        window.wv.playVideo(this.videoList[i].videoUrl);
+        return;
+      }
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.playVideo) {
+        window.webkit.messageHandlers.playVideo.postMessage();
+      }
+      // this.showVideo = i;
+      // setTimeout(_ => {
+      //   let el = document.getElementById("video" + i);
+      //   el.play();
+      //   //如果有播放记录就跳转记录点
+      //   if (this.videoSchedule[this.showVideo]) {
+      //     el.currentTime = this.videoSchedule[this.showVideo];
+      //   }
+      // }, 0);//等待dom加载完成
 
     },
     /**
@@ -314,12 +318,12 @@ export default {
      * 轮播图滚动
      */
     onChange(key) {
-      //记录播放时间
-      let el = document.getElementById("video" + this.showVideo);
-      if (el) {
-        this.videoSchedule[this.showVideo] = el.currentTime;
-      }
-      this.showVideo = -1;//不暂停直接删除video的dom元素
+      // //记录播放时间
+      // let el = document.getElementById("video" + this.showVideo);
+      // if (el) {
+      //   this.videoSchedule[this.showVideo] = el.currentTime;
+      // }
+      // this.showVideo = -1;//不暂停直接删除video的dom元素
       this.sindex = key;
     },
     /**
@@ -481,7 +485,7 @@ export default {
         justify-content: space-between;
         .good_info {
           width: 3rem;
-          height: 4.6rem;
+          height: 4.7rem;
           margin-bottom: 0.4rem;
           position: relative;
           .good_img {
@@ -500,6 +504,10 @@ export default {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+          }
+          .good_prise {
+            font-size: 0.28rem;
+            color: #ff2644;
           }
           .good_btn {
             position: absolute;
@@ -526,7 +534,7 @@ export default {
       }
       .see_more_fixd {
         position: fixed;
-        bottom: 0.5rem;
+        bottom: 0.7rem;
         left: 50%;
         transform: translateX(-50%);
         background-color: rgba($color: #ffffff, $alpha: 0.4);
