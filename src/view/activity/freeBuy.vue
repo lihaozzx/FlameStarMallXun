@@ -197,10 +197,13 @@ export default {
   },
   created() {
     this.getFreebuyVideo();
-    let u = navigator.userAgent;
-    if (u.indexOf("Android") > -1 || u.indexOf("Adr") > -1) {
-      this.isAndroid = true;
+    if (window.webkit && window.webkit.messageHandlers.goLogin) {
+      window.webkit.messageHandlers.chageType.postMessage(10);
     }
+    // let u = navigator.userAgent;
+    // if (u.indexOf("Android") > -1 || u.indexOf("Adr") > -1) {
+    //   this.isAndroid = true;
+    // }
   },
   mounted() {
     //滑动距离
@@ -256,10 +259,9 @@ export default {
       if (window.wv) {
         window.wv.gotoHomeTab();
       }
-      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goHome) {
-        window.webkit.messageHandlers.goHome.postMessage();
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.gotoHome) {
+        window.webkit.messageHandlers.gotoHome.postMessage(666);
       }
-      this.$toast("qweqweqweqweqweqweqweqeqeqweqwe");
       this.$router.push({ name: 'Home' });
     },
     toGoodDetail(id) {
@@ -267,7 +269,6 @@ export default {
         window.wv.gotoGoodsDetail(id);
         return;
       }
-
       this.$router.push({ name: "GoodsDetail", params: { id: id } });
     },
     /**
@@ -279,7 +280,7 @@ export default {
         return;
       }
       if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.playVideo) {
-        window.webkit.messageHandlers.playVideo.postMessage();
+        window.webkit.messageHandlers.playVideo.postMessage(this.videoList[i].videoUrl);
       }
       // this.showVideo = i;
       // setTimeout(_ => {

@@ -353,25 +353,55 @@ export default {
      * 跳转详情
      */
     goZeroDetail(item) {
+      const toDetail = function () {
+        if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
+          window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
+        }
+        if (window.wv) {
+          window.wv.goToDetail(item.id, this.showGoods);
+        }
+        this.$router.push({ name: "ZeroShopDetail", params: { id: item.id }, query: { type: this.showGoods } });
+      }.bind(this);
       if (this.showGoods == 4) {
         const data = {
           type: 4,
           goodsId: item.id
         }
         homeApi.validateRole(data).then(res => {
-          if (res.status == 200 && res.data.messageCode != 'MSG_1001') {
+          if (res.data.messageCode === "MSG_2001") {
+            let u = navigator.userAgent;
+            // Android终端
+            let isAndroid = u.indexOf("Android") > -1 || u.indexOf("Adr") > -1;
+            let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+            sessionStorage.setItem(
+              "referrer",
+              window.location.href.split("/#/")[1]
+            );
+            if (isiOS) {
+              if (window.webkit) {
+                window.webkit.messageHandlers.goLogin.postMessage(666);
+                return;
+              } else {
+                this.$router.replace({ name: "Login" });
+              }
+            } else if (isAndroid) {
+              if (window.wv) {
+                wv.goLogin(666);
+              } else {
+                this.$router.replace({ name: "Login" });
+              }
+            }
+          }
+          else if (res.status == 200 && res.data.messageCode != 'MSG_1001') {
             this.$dialog.alert({ title: '提示', message: res.data.message });
-            return;
+          } else {
+            toDetail();
           }
         })
+      } else {
+        toDetail();
       }
-      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
-        window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ type: this.showGoods, id: item.id }));//id,type
-      }
-      if (window.wv) {
-        window.wv.goToDetail(item.id, this.showGoods);
-      }
-      this.$router.push({ name: "ZeroShopDetail", params: { id: item.id }, query: { type: this.showGoods } });
+
     },
     /**
     *新人免费领
@@ -573,7 +603,6 @@ export default {
         window.webkit.messageHandlers.chageType.postMessage(k);
       }
       if (window.wv) {
-        console.log(123);
         window.wv.chageType(k);
       }
       this.showGoods = k;
