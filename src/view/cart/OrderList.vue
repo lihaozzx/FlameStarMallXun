@@ -1,177 +1,243 @@
 <template>
-    <div class="OrderList">
-      <TopNav :special="$route.params.active" name="我的订单"></TopNav>
-      <van-tabs title-active-color="#FF8D12" color="#FF8D12" v-model="active" animated>
-        <van-tab
-          v-for="(item2, index) in tabList"
-          :title="item2"
-          :key="index"
+  <div class="OrderList">
+    <TopNav
+      :special="$route.params.active"
+      name="我的订单"
+    ></TopNav>
+    <van-tabs
+      title-active-color="#FF8D12"
+      color="#FF8D12"
+      v-model="active"
+      animated
+    >
+      <van-tab
+        v-for="(item2, index) in tabList"
+        :title="item2"
+        :key="index"
+      >
+        <div
+          class="empty-div"
+          v-if="tabContentList.length === 0"
         >
-          <div class="empty-div" v-if="tabContentList.length === 0">
-            <div class="empty-img">
-              <img src="../../assets/order/ic_order_no.png" alt="">
+          <div class="empty-img">
+            <img
+              src="../../assets/order/ic_order_no.png"
+              alt=""
+            >
+          </div>
+          <div class="empty-text">您还没有任何订单呢~</div>
+        </div>
+        <div
+          class="order-box"
+          v-for="(item, i) in tabContentList"
+          :key="i"
+          @click="goOrderDetail(item.id)"
+        >
+          <div class="order-header">
+            <div class="name">
+              <img
+                class="img"
+                src="../../assets/home/ic_store.png"
+                alt=""
+              >
+              <div class="font">{{item.storeName}}</div>
             </div>
-            <div class="empty-text">您还没有任何订单呢~</div>
+            <div class="status">{{getStatusName(item.latestStatus)}}</div>
           </div>
           <div
-            class="order-box"
-            v-for="(item, i) in tabContentList"
+            v-for="(goods, i) in item.orderGoodsDetail"
             :key="i"
-            @click="goOrderDetail(item.id)"
+            class="order-content"
           >
-            <div class="order-header">
+            <img
+              :src="goods.imageUrl"
+              alt=""
+            >
+            <div class="content">
+              <div class="top-box">
+                <div class="name-box">
+                  <div
+                    v-if="goods.goodsTagItem.length > 0 && goods.goodsTagItem[0].tag"
+                    class="ziyin"
+                  >自营</div>
+                  <div class="name">{{goods.goodsName}}</div>
+                </div>
+                <div class="price"><span style="font-size: 0.24rem">￥</span>{{goods.price}}</div>
+              </div>
+              <div class="bottom-box">
+                <div class="model">{{goods.specDesc}}</div>
+                <div class="num">x {{goods.quantity}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="order-total">
+            <div class="number">共{{item.orderGoodsDetail.length}}件</div>
+            <div class="total">合计:</div>
+            <div class="price">￥</div>
+            <div class="price2">{{item.orderAmount}}</div>
+          </div>
+          <div class="btn-box">
+            <van-button
+              v-if="item.isCashBack"
+              @click.stop="goBack(item)"
+              class="btn"
+            >分期返现</van-button>
+            <van-button
+              v-if="showCancel(item.latestStatus)"
+              @click.stop="goCancel(item)"
+              class="btn"
+            >取消订单</van-button>
+            <van-button
+              v-if="showPay(item.latestStatus)"
+              @click.stop="goPay(item)"
+              class="btn2"
+            >付款</van-button>
+            <van-button
+              v-if="showConfirm(item.latestStatus)"
+              @click.stop="goConfirm(item)"
+              class="btn2"
+            >确认收货</van-button>
+            <van-button
+              v-if="showRefund(item.latestStatus)"
+              @click.stop="goRefund(item)"
+              class="btn"
+            >退款</van-button>
+            <van-button
+              v-if="showCancelRefund(item.latestStatus)"
+              @click.stop="goCancelRefund(item)"
+              class="btn"
+            >取消退款</van-button>
+            <van-button
+              v-if="showEvaluation(item.latestStatus)"
+              @click.stop="goEvaluation(item)"
+              class="btn2"
+            >去评价</van-button>
+          </div>
+        </div>
+      </van-tab>
+    </van-tabs>
+    <div v-show="tabContentList.length <= 2 || !tabContentList">
+      <div class="product">
+        <div class="line-div">
+          <div class="line">
+
+          </div>
+          <div class="line2">
+
+          </div>
+        </div>
+        <div class="title">
+          更多好货
+        </div>
+        <div class="line-div">
+          <div class="line">
+
+          </div>
+          <div class="line3">
+
+          </div>
+        </div>
+      </div>
+      <van-list
+        class="quality-container"
+        v-model="loading"
+        :finished="finished"
+        finished-text="已经到底啦"
+        @load="onLoad"
+      >
+        <!--<div slot="loading">-->
+        <!--加载自定义-->
+        <!--</div>-->
+        <div
+          class="quality-item"
+          v-for="(item, index2) in qualityList"
+          :key="index2"
+        >
+          <div @click="checkGoodsDeil(item)">
+            <img
+              class="img"
+              v-if="item.imageUrls[0]"
+              :src="item.imageUrls[0]"
+              alt=""
+            >
+            <img
+              class="img"
+              v-else
+              src="../../assets/zhanw_tb_n.png"
+              alt=""
+            >
+            <div class="content">
               <div class="name">
-                <img class="img" src="../../assets/home/ic_store.png" alt="">
-                <div class="font">{{item.storeName}}</div>
-              </div>
-              <div class="status">{{getStatusName(item.latestStatus)}}</div>
-            </div>
-            <div
-              v-for="(goods, i) in item.orderGoodsDetail"
-              :key="i"
-              class="order-content">
-              <img :src="goods.imageUrl" alt="">
-              <div class="content">
-                <div class="top-box">
-                  <div class="name-box">
-                    <div v-if="goods.goodsTagItem.length > 0 && goods.goodsTagItem[0].tag" class="ziyin">自营</div>
-                    <div class="name">{{goods.goodsName}}</div>
-                  </div>
-                  <div class="price"><span style="font-size: 0.24rem">￥</span>{{goods.price}}</div>
+                <div
+                  v-if="item.tags && item.tags[0] === 1"
+                  class="icon"
+                >
+                  自营
                 </div>
-                <div class="bottom-box">
-                  <div class="model">{{goods.specDesc}}</div>
-                  <div class="num">x {{goods.quantity}}</div>
-                </div>
+                {{item.name}}
               </div>
-            </div>
-            <div class="order-total">
-              <div class="number">共{{item.orderGoodsDetail.length}}件</div>
-              <div class="total">合计:</div>
-              <div class="price">￥</div>
-              <div class="price2">{{item.orderAmount}}</div>
-            </div>
-            <div class="btn-box">
-              <van-button v-if="item.isCashBack" @click.stop="goBack(item)" class="btn">分期返现</van-button>
-              <van-button v-if="showCancel(item.latestStatus)" @click.stop="goCancel(item)" class="btn">取消订单</van-button>
-              <van-button v-if="showPay(item.latestStatus)" @click.stop="goPay(item)" class="btn2">付款</van-button>
-              <van-button v-if="showConfirm(item.latestStatus)" @click.stop="goConfirm(item)" class="btn2">确认收货</van-button>
-              <van-button v-if="showRefund(item.latestStatus)" @click.stop="goRefund(item)" class="btn">退款</van-button>
-              <van-button v-if="showCancelRefund(item.latestStatus)" @click.stop="goCancelRefund(item)" class="btn">取消退款</van-button>
-              <van-button v-if="showEvaluation(item.latestStatus)" @click.stop="goEvaluation(item)" class="btn2">去评价</van-button>
-            </div>
-          </div>
-        </van-tab>
-      </van-tabs>
-      <div v-show="tabContentList.length <= 2 || !tabContentList">
-        <div class="product">
-          <div class="line-div">
-            <div class="line">
-
-            </div>
-            <div class="line2">
-
-            </div>
-          </div>
-          <div class="title">
-            更多好货
-          </div>
-          <div class="line-div">
-            <div class="line">
-
-            </div>
-            <div class="line3">
-
+              <div class="price-container">
+                <div class="price1">￥{{item.dctPrice}}</div>
+                <div class="price2">{{item.orgPrice}}</div>
+              </div>
+              <div class="share">
+                <div class="left">
+                  返 <span style="color: #FF8D12">￥{{item.marketingCashBack.totalAmount}}</span>
+                  返后价 <span style="color: #FF8D12">￥{{parseFloat((item.dctPrice - item.marketingCashBack.totalAmount).toFixed(2))}}</span>
+                </div>
+                <!--<img class="share-img" src="../../assets/home/pinzhi_list_share_icon@2x.png">-->
+              </div>
             </div>
           </div>
         </div>
-        <van-list
-          class="quality-container"
-          v-model="loading"
-          :finished="finished"
-          finished-text="已经到底啦"
-          @load="onLoad"
-        >
-          <!--<div slot="loading">-->
-          <!--加载自定义-->
-          <!--</div>-->
-          <div
-            class="quality-item"
-            v-for="(item, index2) in qualityList"
-            :key="index2"
-          >
-            <div @click="checkGoodsDeil(item)">
-              <img class="img" v-if="item.imageUrls[0]" :src="item.imageUrls[0]" alt="">
-              <img class="img" v-else src="../../assets/zhanw_tb_n.png" alt="">
-              <div class="content">
-                <div class="name">
-                  <div v-if="item.tags && item.tags[0] === 1" class="icon">
-                    自营
-                  </div>
-                  {{item.name}}
-                </div>
-                <div class="price-container">
-                  <div class="price1">￥{{item.dctPrice}}</div>
-                  <div class="price2">{{item.orgPrice}}</div>
-                </div>
-                <div class="share">
-                  <div class="left">
-                    返 <span style="color: #FF8D12">￥{{item.marketingCashBack.totalAmount}}</span>
-                    返后价 <span style="color: #FF8D12">￥{{parseFloat((item.dctPrice - item.marketingCashBack.totalAmount).toFixed(2))}}</span>
-                  </div>
-                  <!--<img class="share-img" src="../../assets/home/pinzhi_list_share_icon@2x.png">-->
-                </div>
-              </div>
-            </div>
-          </div>
-        </van-list>
-      </div>
-      <MyDialog
-        :show="refundDailog"
-        title="申请退款"
-        :selectList="refundList"
-        tips="提示：申请退款前请与商家电话沟通后再进行申请，将减少商家拒绝申请退款概率"
-        @confirm="refundConfirm"
-        @close="closeDialog"
-      >
-      </MyDialog>
-      <MyDialog
-        :show="cancelDailog"
-        title="取消订单"
-        :selectList="cancelList"
-        @confirm="cancelConfirm"
-        @close="closeDialog"
-      >
-
-      </MyDialog>
-      <MyDialog
-        :show="cancelRefundDailog"
-        title="提示"
-        tips="是否取消当前订单退款申请？"
-        @confirm="cancelRefundConfirm"
-        @close="closeDialog"
-      >
-
-      </MyDialog>
-      <MyDialog
-        :show="confirmDailog"
-        title="提示"
-        tips="确认收货？"
-        @confirm="confirmTake"
-        @close="closeDialog"
-      >
-
-      </MyDialog>
-      <MyDialog
-        :show="evaluationdDailog"
-        evaluationd
-        title="商品评价"
-        @confirm="confirmEvaluationd"
-        @close="closeDialog"
-      >
-
-      </MyDialog>
+      </van-list>
     </div>
+    <MyDialog
+      :show="refundDailog"
+      title="申请退款"
+      :selectList="refundList"
+      tips="提示：申请退款前请与商家电话沟通后再进行申请，将减少商家拒绝申请退款概率"
+      @confirm="refundConfirm"
+      @close="closeDialog"
+    >
+    </MyDialog>
+    <MyDialog
+      :show="cancelDailog"
+      title="取消订单"
+      :selectList="cancelList"
+      @confirm="cancelConfirm"
+      @close="closeDialog"
+    >
+
+    </MyDialog>
+    <MyDialog
+      :show="cancelRefundDailog"
+      title="提示"
+      tips="是否取消当前订单退款申请？"
+      @confirm="cancelRefundConfirm"
+      @close="closeDialog"
+    >
+
+    </MyDialog>
+    <MyDialog
+      :show="confirmDailog"
+      title="提示"
+      tips="确认收货？"
+      @confirm="confirmTake"
+      @close="closeDialog"
+    >
+
+    </MyDialog>
+    <MyDialog
+      :show="evaluationdDailog"
+      evaluationd
+      title="商品评价"
+      @confirm="confirmEvaluationd"
+      @close="closeDialog"
+    >
+
+    </MyDialog>
+  </div>
 </template>
 
 <script>
@@ -185,7 +251,7 @@ export default {
     TopNav,
     MyDialog
   },
-  data () {
+  data() {
     return {
       qualityList: [],
       latestStatus: 0,
@@ -206,22 +272,22 @@ export default {
       orderId: ''
     }
   },
-  created () {
+  created() {
     this.active = this.$route.params.active ? parseInt(this.$route.params.active) : 0
     this.init()
     this.getBestChoice()
   },
   methods: {
-    checkGoodsDeil (item) {
-      this.$router.push({name: 'GoodsDetail', params: {id: item.id}})
+    checkGoodsDeil(item) {
+      this.$router.push({ name: 'GoodsDetail', params: { id: item.id } })
     },
-    onLoad () {
+    onLoad() {
       let self = this
       setTimeout(() => {
         self.getBestChoice('pullUp')
       }, 100)
     },
-    getBestChoice (type) {
+    getBestChoice(type) {
       if (type === 'pullUp') {
         this.pageNumber++
         const data = {
@@ -248,21 +314,21 @@ export default {
         })
       }
     },
-    closeDialog () {
+    closeDialog() {
       this.refundDailog = false
       this.cancelDailog = false
       this.cancelRefundDailog = false
       this.confirmDailog = false
       this.evaluationdDailog = false
     },
-    init () {
+    init() {
       if (this.active) {
         this.getOrderList(this.active)
       } else {
         this.getOrderList()
       }
     },
-    refundConfirm (selectDesc) {
+    refundConfirm(selectDesc) {
       console.log(selectDesc)
       const data = {
         orderId: this.orderId,
@@ -278,7 +344,7 @@ export default {
         }
       })
     },
-    cancelConfirm (selectDesc) {
+    cancelConfirm(selectDesc) {
       const data = {
         orderId: this.orderId,
         desc: selectDesc
@@ -293,7 +359,7 @@ export default {
         }
       })
     },
-    cancelRefundConfirm (selectDesc) {
+    cancelRefundConfirm(selectDesc) {
       const data = {
         orderId: this.orderId
       }
@@ -307,7 +373,7 @@ export default {
         }
       })
     },
-    confirmTake () {
+    confirmTake() {
       const data = {
         orderId: this.orderId
       }
@@ -322,7 +388,7 @@ export default {
         }
       })
     },
-    confirmEvaluationd (data) {
+    confirmEvaluationd(data) {
       let data2 = {}
       if (data.content) {
         data2 = {
@@ -348,39 +414,39 @@ export default {
         }
       })
     },
-    goRefund (item) {
+    goRefund(item) {
       this.orderId = item.id
       this.refundDailog = true
     },
-    goConfirm (item) {
+    goConfirm(item) {
       this.orderId = item.id
       this.confirmDailog = true
     },
-    goCancelRefund (item) {
+    goCancelRefund(item) {
       this.orderId = item.id
       this.cancelRefundDailog = true
     },
-    goEvaluation (item) {
+    goEvaluation(item) {
       this.orderId = item.id
       this.evaluationdDailog = true
     },
-    goCancel (item) {
+    goCancel(item) {
       this.orderId = item.id
       this.cancelDailog = true
     },
-    goBack (item) {
-      this.$router.push({name: 'BackDetail', params: {id: item.id}})
+    goBack(item) {
+      this.$router.push({ name: 'BackDetail', params: { id: item.id } })
     },
-    goPay (item) {
+    goPay(item) {
       const orderInfo = {
         createTime: item.transStatementDetail.createTime,
         id: item.transStatementDetail.transId,
         paymentAmount: item.transStatementDetail.orderAmount,
         orderId: item.transStatementDetail.orderId
       }
-      this.$router.push({name: 'Pay', params: {orderInfo: encodeURIComponent(JSON.stringify(orderInfo))}})
+      this.$router.push({ name: 'Pay', params: { orderInfo: encodeURIComponent(JSON.stringify(orderInfo)) } })
     },
-    showBack (v) {
+    showBack(v) {
       const arr = [1, 2, 6, 10, 12]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -388,7 +454,7 @@ export default {
         return false
       }
     },
-    showCancel (v) {
+    showCancel(v) {
       const arr = [1]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -396,7 +462,7 @@ export default {
         return false
       }
     },
-    showPay (v) {
+    showPay(v) {
       const arr = [1]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -404,7 +470,7 @@ export default {
         return false
       }
     },
-    showConfirm (v) {
+    showConfirm(v) {
       const arr = [4]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -412,7 +478,7 @@ export default {
         return false
       }
     },
-    showRefund (v) {
+    showRefund(v) {
       const arr = [2, 5, 11]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -420,7 +486,7 @@ export default {
         return false
       }
     },
-    showEvaluation (v) {
+    showEvaluation(v) {
       const arr = [5]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -428,7 +494,7 @@ export default {
         return false
       }
     },
-    showCancelRefund (v) {
+    showCancelRefund(v) {
       const arr = [7, 8]
       if (arr.indexOf(v) !== -1) {
         return true
@@ -436,7 +502,7 @@ export default {
         return false
       }
     },
-    getOrderList (v = '') {
+    getOrderList(v = '') {
       if (v === '1' || v === 1) {
         v = '1'
       } else if (v === '2' || v === 2) {
@@ -446,7 +512,7 @@ export default {
       } else if (v === '4' || v === 4) {
         v = '7,8,9,10,11'
       } else {
-        v = ''
+        v = null
       }
       const data = {
         pageNumber: 1,
@@ -459,7 +525,7 @@ export default {
         }
       })
     },
-    getStatusName (v) {
+    getStatusName(v) {
       const val = v + ''
       switch (val) {
         case '1':
@@ -488,18 +554,18 @@ export default {
           return '已取消'
       }
     },
-    goOrderDetail (id) {
-      this.$router.push({name: 'OrderDetail', params: {orderId: id}})
+    goOrderDetail(id) {
+      this.$router.push({ name: 'OrderDetail', params: { orderId: id } })
     }
   },
   watch: {
-    active (v) {
+    active(v) {
       console.log(v)
       if (v === 0) {
-        this.$router.replace({name: 'OrderList', params: {active: v}})
+        this.$router.replace({ name: 'OrderList', params: { active: v } })
         this.getOrderList()
       } else {
-        this.$router.replace({name: 'OrderList', params: {active: v}})
+        this.$router.replace({ name: 'OrderList', params: { active: v } })
         this.getOrderList(v)
       }
     }
@@ -513,38 +579,38 @@ export default {
   .product {
     display: flex;
     justify-content: center;
-    width:100%;
-    height:0.8rem;
-    background:rgba(244,244,244,1);
+    width: 100%;
+    height: 0.8rem;
+    background: rgba(244, 244, 244, 1);
     .line-div {
       margin-top: 0.3rem;
       .line {
-        width:1rem;
-        height:0.03rem;
-        background:rgba(255,141,18,1);
-        border-radius:1px;
+        width: 1rem;
+        height: 0.03rem;
+        background: rgba(255, 141, 18, 1);
+        border-radius: 1px;
       }
       .line2 {
         margin-top: 0.1rem;
         margin-left: 0.5rem;
-        width:0.5rem;
-        height:0.03rem;
-        background:rgba(255,141,18,1);
-        border-radius:1px;
+        width: 0.5rem;
+        height: 0.03rem;
+        background: rgba(255, 141, 18, 1);
+        border-radius: 1px;
       }
       .line3 {
         margin-top: 0.1rem;
-        width:0.5rem;
-        height:0.03rem;
-        background:rgba(255,141,18,1);
-        border-radius:1px;
+        width: 0.5rem;
+        height: 0.03rem;
+        background: rgba(255, 141, 18, 1);
+        border-radius: 1px;
       }
     }
     .title {
       margin: 0.1rem 0.2rem 0.2rem 0.2rem;
-      font-family:PingFang-SC-Bold;
-      font-weight:bold;
-      color:rgba(51,51,51,1);
+      font-family: PingFang-SC-Bold;
+      font-weight: bold;
+      color: rgba(51, 51, 51, 1);
       font-size: 0.34rem;
     }
   }
@@ -591,15 +657,15 @@ export default {
           .icon {
             display: inline-block;
             text-align: center;
-            width:0.7rem;
-            height:0.28rem;
+            width: 0.7rem;
+            height: 0.28rem;
             line-height: 0.28rem;
-            background:rgba(255,81,122,1);
-            border-radius:0.14rem;
-            font-size:0.2rem;
-            font-family:PingFang-SC-Medium;
-            font-weight:500;
-            color:rgba(255,255,255,1);
+            background: rgba(255, 81, 122, 1);
+            border-radius: 0.14rem;
+            font-size: 0.2rem;
+            font-family: PingFang-SC-Medium;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 1);
             margin-top: 0.06rem;
             margin-right: 0.13rem;
           }
@@ -638,7 +704,7 @@ export default {
           .left {
             padding-left: 0.1rem;
             padding-right: 0.1rem;
-            background: #FCF3ED;
+            background: #fcf3ed;
             font-size: 0.24rem;
             font-family: PingFang-SC-Medium;
             font-weight: 500;
@@ -653,25 +719,25 @@ export default {
       }
     }
   }
-  .empty-div{
-   text-align: center;
+  .empty-div {
+    text-align: center;
     /*height: 4.24rem;*/
     background: #ffffff;
-    .empty-img{
+    .empty-img {
       padding-top: 0.72rem;
-      img{
+      img {
         width: 2rem;
         height: 2rem;
         display: block;
         margin: 0 auto;
       }
     }
-    .empty-text{
+    .empty-text {
       margin-top: 0.3rem;
-      font-size:0.28rem;
-      font-family:PingFang-SC-Regular;
-      font-weight:400;
-      color:rgba(51,51,51,1);
+      font-size: 0.28rem;
+      font-family: PingFang-SC-Regular;
+      font-weight: 400;
+      color: rgba(51, 51, 51, 1);
       padding-bottom: 0.96rem;
     }
   }
@@ -679,8 +745,8 @@ export default {
     margin-top: 0.2rem;
     .order-header {
       padding: 0 0.26rem;
-      height:0.8rem;
-      background:rgba(255,255,255,1);
+      height: 0.8rem;
+      background: rgba(255, 255, 255, 1);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -695,23 +761,23 @@ export default {
         }
         .font {
           line-height: 0.3rem;
-          font-size:0.26rem;
-          font-family:PingFang-SC-Medium;
-          font-weight:500;
-          color:rgba(102,102,102,1);
+          font-size: 0.26rem;
+          font-family: PingFang-SC-Medium;
+          font-weight: 500;
+          color: rgba(102, 102, 102, 1);
         }
       }
       .status {
-        font-size:0.26rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:rgba(227,58,89,1);
+        font-size: 0.26rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(227, 58, 89, 1);
       }
     }
 
     .order-content {
       /*height:1.8rem;*/
-      background:rgba(255,255,255,1);
+      background: rgba(255, 255, 255, 1);
       display: flex;
       padding: 0.2rem 0.3rem 0.4rem 0.45rem;
       border-bottom: 1px #f4f4f4 solid;
@@ -731,121 +797,121 @@ export default {
             align-items: center;
             .ziyin {
               text-align: center;
-              width:0.7rem;
-              height:0.28rem;
+              width: 0.7rem;
+              height: 0.28rem;
               line-height: 0.28rem;
-              background:rgba(255,81,122,1);
-              border-radius:0.14rem;
-              font-size:0.2rem;
-              font-family:PingFang-SC-Medium;
-              font-weight:500;
-              color:rgba(255,255,255,1);
+              background: rgba(255, 81, 122, 1);
+              border-radius: 0.14rem;
+              font-size: 0.2rem;
+              font-family: PingFang-SC-Medium;
+              font-weight: 500;
+              color: rgba(255, 255, 255, 1);
               margin-right: 0.13rem;
             }
             .name {
               width: 3.5rem;
-              height:0.6rem;
+              height: 0.6rem;
               line-height: 0.6rem;
-              font-size:0.28rem;
-              font-family:PingFang-SC-Medium;
-              font-weight:500;
-              color:rgba(51,51,51,1);
+              font-size: 0.28rem;
+              font-family: PingFang-SC-Medium;
+              font-weight: 500;
+              color: rgba(51, 51, 51, 1);
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
             }
           }
           .price {
-            font-size:0.32rem;
-            font-family:PingFang-SC-Regular;
-            font-weight:400;
-            color:#999;
+            font-size: 0.32rem;
+            font-family: PingFang-SC-Regular;
+            font-weight: 400;
+            color: #999;
           }
         }
         .bottom-box {
           display: flex;
           justify-content: space-between;
           .model {
-            font-size:0.24rem;
-            font-family:PingFang-SC-Regular;
-            font-weight:400;
-            color:rgba(153,153,153,1);
+            font-size: 0.24rem;
+            font-family: PingFang-SC-Regular;
+            font-weight: 400;
+            color: rgba(153, 153, 153, 1);
           }
           .num {
-            font-size:0.28rem;
-            font-family:PingFang-SC-Regular;
-            font-weight:400;
-            color:#999;
+            font-size: 0.28rem;
+            font-family: PingFang-SC-Regular;
+            font-weight: 400;
+            color: #999;
           }
         }
       }
     }
     .order-total {
       padding: 0.14rem 0.4rem;
-      background:rgba(255,255,255,1);
+      background: rgba(255, 255, 255, 1);
       display: flex;
       align-items: center;
       justify-content: flex-end;
       .number {
         margin-right: 0.31rem;
-        font-size:0.26rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:rgba(102,102,102,1);
+        font-size: 0.26rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(102, 102, 102, 1);
       }
       .total {
         margin-right: 0.1rem;
-        font-size:0.26rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:rgba(102,102,102,1);
+        font-size: 0.26rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(102, 102, 102, 1);
       }
       .price {
-        font-size:0.24rem;
-        font-family:PingFang-SC-Bold;
-        font-weight:bold;
-        color:rgba(51,51,51,1);
+        font-size: 0.24rem;
+        font-family: PingFang-SC-Bold;
+        font-weight: bold;
+        color: rgba(51, 51, 51, 1);
       }
       .price2 {
-        font-size:0.32rem;
-        font-family:PingFang-SC-Bold;
-        font-weight:bold;
-        color:rgba(51,51,51,1);
+        font-size: 0.32rem;
+        font-family: PingFang-SC-Bold;
+        font-weight: bold;
+        color: rgba(51, 51, 51, 1);
       }
     }
     .btn-box {
-      width:100%;
-      height:0.8rem;
-      background:#fff;
+      width: 100%;
+      height: 0.8rem;
+      background: #fff;
       display: flex;
       justify-content: flex-end;
       .btn {
         width: 1.5rem;
         padding: 0;
         margin-right: 0.2rem;
-        height:0.56rem;
+        height: 0.56rem;
         line-height: 0.56rem;
-        background:rgba(255,255,255,1);
-        border:0.02rem solid rgba(153,153,153,1);
-        border-radius:0.28rem;
-        font-size:0.26rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:rgba(153,153,153,1);
+        background: rgba(255, 255, 255, 1);
+        border: 0.02rem solid rgba(153, 153, 153, 1);
+        border-radius: 0.28rem;
+        font-size: 0.26rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: rgba(153, 153, 153, 1);
       }
       .btn2 {
         width: 1.5rem;
         padding: 0;
         margin-right: 0.2rem;
-        height:0.56rem;
+        height: 0.56rem;
         line-height: 0.56rem;
-        background:rgba(255,255,255,1);
-        border:0.02rem solid #FF517A;
-        border-radius:0.28rem;
-        font-size:0.26rem;
-        font-family:PingFang-SC-Medium;
-        font-weight:500;
-        color:#FF517A;
+        background: rgba(255, 255, 255, 1);
+        border: 0.02rem solid #ff517a;
+        border-radius: 0.28rem;
+        font-size: 0.26rem;
+        font-family: PingFang-SC-Medium;
+        font-weight: 500;
+        color: #ff517a;
       }
     }
   }

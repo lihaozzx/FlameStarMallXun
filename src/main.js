@@ -213,7 +213,7 @@ axios.interceptors.request.use(
     if (token) {
       config.headers = {
         token: token,
-        Accept: "application/json"
+        Accept: "application/json",
       };
     }
     return config;
@@ -222,14 +222,16 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-axios.interceptors.response.use(response => {
-  if (response.status == 200) {
-    // return response.data;
-  }
-  return response;
-}, err => {
-  return Promise.reject(err);
-})
+axios.interceptors.response.use(
+  response => {
+    if (response.status == 200) {
+      // return response.data;
+    }
+    return response;
+  },
+  err => {
+    return Promise.reject(err);
+  })
 
 /* eslint-disable no-new */
 new Vue({

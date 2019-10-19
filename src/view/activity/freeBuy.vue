@@ -183,13 +183,13 @@ export default {
      * 盒子的高度
      */
     contentHeight() {
-      return Math.ceil(this.goodsList.length / 2) * 5.1 + 15;
+      return Math.ceil(this.goodsList.length / 2) * 5.4 + 15;
     },
     /**
      * 撑开div的高度
      */
     rptHeight() {
-      return Math.ceil(this.goodsList.length / 2) * 5.1 - 10;
+      return Math.ceil(this.goodsList.length / 2) * 5.4 - 10;
     }
   },
   watch: {
@@ -486,7 +486,7 @@ export default {
         justify-content: space-between;
         .good_info {
           width: 3rem;
-          height: 4.7rem;
+          height: 5rem;
           margin-bottom: 0.4rem;
           position: relative;
           .good_img {
@@ -500,6 +500,7 @@ export default {
             width: 100%;
             margin-top: 0.24rem;
             font-size: 0.28rem;
+            line-height: 0.3rem;
             color: #333333;
             overflow: hidden;
             display: -webkit-box;
@@ -509,6 +510,8 @@ export default {
           .good_prise {
             font-size: 0.28rem;
             color: #ff2644;
+            position: absolute;
+            bottom: 0.7rem;
           }
           .good_btn {
             position: absolute;
