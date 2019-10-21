@@ -265,9 +265,12 @@ export default {
       this.$router.push({ name: 'Home' });
     },
     toGoodDetail(id) {
+      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
+        window.webkit.messageHandlers.goDetail.postMessage(JSON.stringify({ itemID: id }));
+        return;
+      }
       if (window.wv) {
         window.wv.gotoGoodsDetail(id);
-        return;
       }
       this.$router.push({ name: "GoodsDetail", params: { id: id } });
     },
@@ -327,18 +330,6 @@ export default {
       // this.showVideo = -1;//不暂停直接删除video的dom元素
       this.sindex = key;
     },
-    /**
-     * 跳转商品详情
-     */
-    gotoGoodDetail(item) {
-      if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.goDetail) {
-        window.webkit.messageHandlers.goDetail.postMessage(item.id);//id,type
-      }
-      if (window.wv) {
-        window.wv.goToDetail(item.id);
-      }
-      this.$router.push({ name: "GoodsDetail", params: { id: item.id } });
-    }
   },
 };
 </script>
