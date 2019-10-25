@@ -46,6 +46,8 @@ const Test = _ => import("@/view/Test");
 const Test2 = _ => import("@/view/Test2");
 const PlayPlay = _ => import("@/view/PlayPlay");
 const FreeBuy = _ => import("@/view/activity/freeBuy");
+const Dismond = _ => import("@/view/activity/dismond");
+const DismondInfo = _ => import("@/view/activity/dismondInfo");
 
 Vue.use(Router);
 
@@ -321,7 +323,24 @@ export default new Router({
       meta: {
         tourists: true
       }
+    },
+    {
+      path: "/dismond",
+      name: "dismond",
+      component: Dismond,
+      meta: {
+        tourists: true
+      }
+    },
+    {
+      path: "/dismondInfo/:type",
+      name: "dismondInfo",
+      component: DismondInfo,
+      meta: {
+        tourists: true
+      }
     }
+
   ],
   scrollBehavior(to, from, savedPosition) {
     // return 期望滚动到哪个的位置

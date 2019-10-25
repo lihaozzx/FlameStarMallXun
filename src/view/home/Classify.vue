@@ -406,7 +406,7 @@ export default {
      * 页面跳转
      */
     goPage(forwardDest, forwardParam) {
-      // // forwardDest1-商品详情页；2-商品一级分类页；3-商品二级分类页；4-会员页；5-话题分类页；6-话题详情页；7-充值页；8-商家入驻页
+      // // forwardDest1-商品详情页；2-商品一级分类页；3-商品二级分类页；4-会员页；5-话题分类页；6-话题详情页；7-充值页；8-商家入驻页；9-freebuy活动页
       switch (forwardDest) {
         case 1:
           this.$router.push({
@@ -442,6 +442,9 @@ export default {
           break;
         case 8:
           this.$router.push({ name: "MerchantsRegister" });
+          break;
+        case 9:
+          this.$router.push({ name: "freeBuy" });
           break;
       }
     },

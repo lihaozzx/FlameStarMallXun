@@ -1,4 +1,4 @@
-!<template>
+<template>
   <div
     class="free_buy"
     id="freeBuy"
@@ -271,6 +271,7 @@ export default {
       }
       if (window.wv) {
         window.wv.gotoGoodsDetail(id);
+        return;
       }
       this.$router.push({ name: "GoodsDetail", params: { id: id } });
     },

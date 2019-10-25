@@ -282,14 +282,12 @@ export default {
       haoSeconds: [],
       showGoods: 2,
       zeroGoodText: ['需支付1分钱，支付成功后立刻返还至余额;每期新品限领一份，分享好友即可再领一份。', '需要支付1分钱（用信用卡支付），支付成功后立刻返还至余额，仅限领取一份。', ' ', ' '],
-      zeroActivityText: ['', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂时中断，请等待哦', '活动已经结束'],
+      zeroActivityText: ['活动暂未开始，请等待哦', '活动暂未开始，请等待哦', '本活动正在进行中', '活动暂未开始，请等待哦', '活动暂未开始，请等待哦'],
       showRule: false,
     };
   },
   created() {
-    if (this.$route.query.type) {
-      this.showGoods = this.$route.query.type;
-    }
+    this.showGoods = this.$route.query.type || 2;
     this.show = !localStorage.getItem("zeroTwo");
     localStorage.setItem("zeroTwo", true);
     this.getWeChatSnapshot();
@@ -309,8 +307,8 @@ export default {
       this.$store.commit(types.SET_INVITER_CODE, ""); // 直接调用mutations改变值（不可异步）
       this.goHomeShow = false;
     }
-    if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.initDataZero) {
-      window.webkit.messageHandlers.initDataZero.postMessage(0, this.showGoods);
+    if (window.webkit && window.webkit.messageHandlers.goLogin && window.webkit.messageHandlers.chageType) {
+      window.webkit.messageHandlers.chageType.postMessage(this.showGoods);
     }
     if (window.wv) {
       window.wv.initDataZero(0, this.showGoods);

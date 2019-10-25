@@ -65,7 +65,7 @@
           </van-swipe-item>
         </van-swipe>
         <div class="time-box">
-          <span class="time_text">活动已开始，快来参与吧!</span>
+          <span class="time_text">{{goodsDetail.status==2?'活动已开始，快来参与吧!':'活动暂未开始，请等待哦'}}</span>
           <!-- <div class="number">{{hours.length > 1 ? hours[0] : 0}}</div>
           <div class="number">{{hours.length > 1 ? hours[1] : hours[0]}}</div>
           <div class="word">时</div>
