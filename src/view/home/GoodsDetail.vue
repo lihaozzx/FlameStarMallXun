@@ -640,6 +640,7 @@ export default {
     this.getContact();
     this.weChatSnapshot();
     this.getMessageShuffling();
+    console.log(window.devicePixelRatio);
   },
   methods: {
     getMessageShuffling() {
@@ -659,6 +660,9 @@ export default {
         }
       }, 3000);
     },
+    /**
+     * 分享图
+     */
     weChatSnapshot() {
       const data = {
         mode: 1,
@@ -678,8 +682,7 @@ export default {
       });
     },
     /**
-     * 解决canvas图片跨域
-     * 转base64
+     * 转base64 解决canvas图片跨域
      */
     convertImgToBase64(url) {
       return new Promise((resolve, reject) => {
@@ -699,9 +702,9 @@ export default {
         img.src = url;
       })
     },
-    parseValue: function (value) {
-      return parseInt(value, 10);
-    },
+    /**
+     * 
+     */
     getDpr: function () {
       if (window.devicePixelRatio && window.devicePixelRatio > 1) {
         return window.devicePixelRatio;

@@ -736,59 +736,58 @@ export default {
   margin: 0 auto;
 
   .chose_way {
-    width: 100%;
+    width: 7.1rem;
+    margin: 0 auto;
+    height: 0.64rem;
+    font-size: 0.26rem;
+    font-weight: bold;
+    text-align: center;
     display: flex;
-    position: relative;
-    right: 0.04rem;
+    justify-content: space-between;
+    border: 0.02rem solid rgba(255, 255, 255, 1);
+    border-radius: 0.32rem;
+    background: rgba(254, 166, 128, 1);
     .way_bas {
-      white-space: nowrap;
-      font-weight: bold;
-      line-height: 0.18rem;
-      text-shadow: 0px 3px 3px rgba(203, 74, 119, 0.2);
+      height: 100%;
       box-sizing: border-box;
-      border-radius: 0.04rem;
+      padding: 0.12rem 0.22rem;
+      white-space: nowrap;
     }
     .way {
-      font-size: 0.26rem;
-      color: rgba(255, 255, 255, 1);
-      border: solid rgba(203, 74, 119, 0.2);
-      border-width: 0 0 0.04rem 0;
+      color: #ffffff;
     }
     .way_chosed {
-      font-size: 0.28rem;
-      color: rgba(255, 254, 203, 1);
-      border: solid rgba(203, 74, 119, 0.2);
-      border-width: 0.04rem 0.04rem 0 0.04rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      color: #ffffff;
+      border-radius: 0.32rem;
+      animation: change 0.3s linear forwards;
     }
-    .way_chosed::after {
-      width: 0;
-      height: 0;
-      border-left: 0.45rem solid #fffecb;
-      border-right: 0.45rem solid #fffecb;
-      border-top: 0.04rem solid #fffecb;
-      border-bottom: 0.04rem solid #fffecb;
-      border-radius: 0.04rem;
-      margin-top: 0.2rem;
-      content: "";
+    .s1.way_chosed {
+      border-right: 0.03rem solid rgba(255, 255, 255, 1);
     }
-    .s1 {
-      padding: 0.14rem 0.25rem 0 0.5rem;
-    }
-    .s2 {
-      padding: 0.14rem 0.17rem 0 0.17rem;
-    }
-    .s3 {
-      padding: 0.14rem 0.5rem 0 0.17rem;
+    .s2.way_chosed {
+      border-left: 0.03rem solid rgba(255, 255, 255, 1);
+      border-right: 0.03rem solid rgba(255, 255, 255, 1);
     }
     .s3.way_chosed {
-      color: #a53e61 !important;
+      border-left: 0.03rem solid rgba(255, 255, 255, 1);
+      color: #d26a3e;
     }
-    .s3.way_chosed::after {
-      border-color: #a53e61 !important;
+    @keyframes change {
+      0% {
+        transform: translateY(-20%);
+      }
+      20% {
+        transform: translateY(20%);
+      }
+      60% {
+        transform: translateY(-10%);
+      }
+      80% {
+        transform: translateY(10%);
+      }
+      100% {
+        background-color: #ffd943;
+      }
     }
   }
 
