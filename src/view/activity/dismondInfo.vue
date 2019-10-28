@@ -4,7 +4,10 @@
       name="钻石合伙人6大回报"
       bc="#FF2644"
     ></TopNav>
-    <van-tabs v-model="showTap">
+    <van-tabs
+      v-model="showTap"
+      @change="tOnChange"
+    >
       <van-tab
         v-for="(s,index) in ways"
         :key="index"
@@ -21,6 +24,7 @@
       indicator-color="white"
       :show-indicators="false"
       @change="onChange"
+      ref="swipev"
     >
       <van-swipe-item><img
           class="info_img"
@@ -79,23 +83,13 @@ export default {
   created() {
     this.showTap = parseInt(this.$route.params.type);
     this.initIndex = this.showTap;
-    // (function () {
-    //   let i = 1;
-    //   let t = 0;
-    //   setInterval(() => {
-    //     if (i * 1000 == t) {
-    //       console.log(i);
-    //       i++;
-    //       t = 0;
-    //     }
-    //     t += 100;
-    //   }, 100);
-    // })()
-
   },
   methods: {
     onChange(e) {
       this.showTap = e;
+    },
+    tOnChange(e) {
+      this.$refs.swipev.swipeTo(this.showTap);
     }
   },
   components: {
