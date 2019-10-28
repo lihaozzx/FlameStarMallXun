@@ -76,12 +76,40 @@
 </template>
 
 <script>
+import wxApi from "../../api/wx";
+import wx from 'weixin-js-sdk';
 export default {
   data() {
     return {
       showBuy: false,
       showTec: false
     };
+  },
+  mounted() {
+
+    const data = {
+      url: window.location.href
+    }
+    wxApi.weChatSharingConfig(data).then(res => {
+      if (res.status == 200 && res.data.messageCode == "MSG_1001") {
+        wx.config({
+          debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          ...res.data.content,
+          jsApiList: ["updateAppMessageShareData"] // 必填，需要使用的JS接口列表
+        });
+        wx.ready(function () {
+          wx.updateAppMessageShareData({
+            title: '【钻石合伙人招募令】', // 分享标题
+            desc: '加入寻草记～共赢未来，带你提前实现财富自由！！！', // 分享描述
+            link: window.location.href, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: 'https://xuncaoji.yzsaas.cn/pop_logo.png', // 分享图标
+            success: function () {
+              // 设置成功
+            }
+          })
+        });
+      }
+    })
   },
   methods: {
     toInfo(i) {
@@ -97,7 +125,8 @@ img {
 }
 .content {
   background-image: linear-gradient(#ff2644 200px, #ffffff 1px);
-  min-height: 97vh;
+  min-height: 100vh;
+  padding-bottom: 1rem;
 }
 
 .title {

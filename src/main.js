@@ -19,6 +19,8 @@ Vue.use(Vant);
 Vue.config.productionTip = false;
 router.beforeEach((to, from, next) => {
   let href = window.location.href;
+  console.log(to.fullPath);
+
   if (
     href.indexOf("groupmessage") > -1 ||
     href.indexOf("singlemessage") > -1 ||

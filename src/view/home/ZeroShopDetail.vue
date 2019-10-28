@@ -1224,6 +1224,7 @@ export default {
   width: 100%;
   background: #f4f4f4;
   margin-bottom: 1rem;
+  min-height: 100vh;
   .swipe {
     width: 100%;
     height: 7.5rem;

@@ -3,7 +3,7 @@ import wxApi from '@/api/wx'
 import params from '@/conf/params'
 const jsApiList = ['onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ', 'onMenuShareWeibo', 'updateAppMessageShareData']
 // 要用到微信API
-function getJSSDK (url, dataForWeixin, mode) {
+function getJSSDK(url, dataForWeixin, mode) {
   const data = {
     url: url
   }
@@ -44,8 +44,8 @@ function getJSSDK (url, dataForWeixin, mode) {
         desc: dataForWeixin.desc,
         link: params.testEnvironmentHost + dataForWeixin.linkurl,
         imgUrl: dataForWeixin.img,
-        trigger: function trigger (res) { },
-        success: function success (res) {
+        trigger: function trigger(res) { },
+        success: function success(res) {
           const data = {
             mode: mode
           }
@@ -54,10 +54,10 @@ function getJSSDK (url, dataForWeixin, mode) {
             // alert(res.data.content)
           })
         },
-        cancel: function cancel (res) {
+        cancel: function cancel(res) {
           // alert('分享取消3333')
         },
-        fail: function fail (res) {
+        fail: function fail(res) {
           // alert('分享失败3333')
         }
       })
