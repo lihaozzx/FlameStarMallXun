@@ -1,6 +1,6 @@
 export default {
   base_url: 'mall',
-  testEnvironmentHost: 'https://xuncaoji.yzsaas.cn' //  https://xuncj.yzsaas.cn 正式 // https://xuncaoji.yzsaas.cn 测试
+  testEnvironmentHost: 'https://xuncj.yzsaas.cn' //  https://xuncj.yzsaas.cn 正式 // https://xuncaoji.yzsaas.cn 测试
   // tencent_lbs_key: 'RUHBZ-DFIRG-O3HQO-IF6ZC-DZRDF-KXF75',
   // gaode_lbs_key: '3e3750bf2ffe088b75c3e86a0094d12d',
   // rong_appKey: 'tdrvipkstqxx5',

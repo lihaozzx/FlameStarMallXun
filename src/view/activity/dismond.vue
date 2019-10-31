@@ -78,6 +78,7 @@
 <script>
 import wxApi from "../../api/wx";
 import wx from 'weixin-js-sdk';
+import params from '../../conf/params'
 export default {
   data() {
     return {
@@ -86,7 +87,6 @@ export default {
     };
   },
   mounted() {
-
     const data = {
       url: window.location.href
     }
@@ -102,7 +102,7 @@ export default {
             title: '【钻石合伙人招募令】', // 分享标题
             desc: '加入寻草记～共赢未来，带你提前实现财富自由！！！', // 分享描述
             link: window.location.href, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-            imgUrl: 'https://xuncaoji.yzsaas.cn/pop_logo.png', // 分享图标
+            imgUrl: params.testEnvironmentHost + '/pop_logo.png', // 分享图标
             success: function () {
               // 设置成功
             }

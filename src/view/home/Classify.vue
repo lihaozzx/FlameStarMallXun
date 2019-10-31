@@ -700,10 +700,11 @@ export default {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
   width: 100%;
-  height: 1.8rem;
+  // height: 1.8rem;
+  background-color: #fff;
   img {
     width: 100%;
-    height: 100%;
+    // height: 100%;
     display: block;
   }
 }
